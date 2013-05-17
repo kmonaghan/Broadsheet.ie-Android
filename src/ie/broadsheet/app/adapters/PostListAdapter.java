@@ -12,6 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 public class PostListAdapter extends ArrayAdapter<Post> {
     // private static final String TAG = "PostListAdapter";
 
@@ -43,7 +46,7 @@ public class PostListAdapter extends ArrayAdapter<Post> {
             holder.titleView = (TextView) v.findViewById(R.id.post_title);
             holder.dateView = (TextView) v.findViewById(R.id.post_date);
             holder.commentCountView = (TextView) v.findViewById(R.id.comment_count);
-
+            holder.featuredImage = (ImageView) v.findViewById(R.id.featuredImage);
             v.setTag(holder);
         } else
             holder = (ViewHolder) v.getTag();
@@ -55,6 +58,14 @@ public class PostListAdapter extends ArrayAdapter<Post> {
             holder.dateView.setText(post.getDate());
             holder.commentCountView.setText(post.getCommentCountString());
 
+            String featuredImage = post.getFeaturedImage();
+
+            if ((featuredImage != null) && (featuredImage.length() > 0)) {
+                DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory().cacheOnDisc()
+
+                .build();
+                ImageLoader.getInstance().displayImage(featuredImage, holder.featuredImage, options);
+            }
         }
 
         return v;

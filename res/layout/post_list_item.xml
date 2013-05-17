@@ -36,15 +36,15 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/featuredImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/standard_margin"
+        android:background="@drawable/image_border"
         android:contentDescription="@string/large_post_image"
         android:minHeight="@dimen/large_post_image_height"
         android:minWidth="@dimen/large_post_image_width"
-        android:src="@drawable/default_post_image" 
-        android:background="@drawable/image_border" />
+        android:src="@drawable/default_post_image" />
 
 </LinearLayout>

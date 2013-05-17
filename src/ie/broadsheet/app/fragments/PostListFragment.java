@@ -4,7 +4,6 @@ import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -71,6 +70,8 @@ public class PostListFragment extends SherlockListFragment {
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
+
+        getListView().setScrollBarStyle(ListView.SCROLLBARS_OUTSIDE_INSET);
     }
 
     @Override
@@ -118,7 +119,6 @@ public class PostListFragment extends SherlockListFragment {
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Log.d(TAG, "item clicked");
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         mCallbacks.onItemSelected(position);
