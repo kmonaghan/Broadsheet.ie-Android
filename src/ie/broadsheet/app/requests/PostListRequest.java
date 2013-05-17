@@ -11,9 +11,9 @@ import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpice
 public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
     private String baseUrl;
 
-    private int page;
+    private int page = 1;
 
-    private int count = 20;
+    private int count = 10;
 
     public int getPage() {
         return page;

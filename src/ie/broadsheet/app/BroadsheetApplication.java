@@ -2,6 +2,7 @@ package ie.broadsheet.app;
 
 import ie.broadsheet.app.model.json.Post;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Application;
@@ -17,7 +18,11 @@ public class BroadsheetApplication extends Application {
     }
 
     public void setPosts(List<Post> posts) {
-        this.posts = posts;
+        if (this.posts.size() > 0) {
+            this.posts.addAll(posts);
+        } else {
+            this.posts = posts;
+        }
     }
 
     @Override
@@ -27,5 +32,7 @@ public class BroadsheetApplication extends Application {
         // Create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
         ImageLoader.getInstance().init(config);
+
+        this.posts = new ArrayList<Post>();
     }
 }

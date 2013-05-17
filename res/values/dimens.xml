@@ -4,5 +4,8 @@
     <dimen name="activity_horizontal_margin">8dp</dimen>
     <dimen name="activity_vertical_margin">8dp</dimen>
     <dimen name="post_title">24dp</dimen>
+    <dimen name="large_post_image_width">300dp</dimen>
+    <dimen name="large_post_image_height">150dp</dimen>
+    <dimen name="standard_margin">8dp</dimen>
 
 </resources>

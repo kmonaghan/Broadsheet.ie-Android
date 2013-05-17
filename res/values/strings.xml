@@ -8,5 +8,8 @@
     <string name="title_post_list">Posts</string>
     <string name="title_post_detail">Post Detail</string>
     <string name="load_more">Loading more...</string>
+    <string name="large_post_image">Feature image for the post</string>
+    <string name="action_label_refresh">Refresh</string>
+    <string name="action_label_search">Search</string>
 
 </resources>
