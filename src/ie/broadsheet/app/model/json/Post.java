@@ -56,8 +56,8 @@ public class Post {
     @Key
     private String comment_status;
 
-    // @Key
-    // private List<Attachments> attachments;
+    @Key
+    private List<Attachments> attachments;
 
     public int getId() {
         return id;
@@ -195,19 +195,19 @@ public class Post {
         this.comment_status = comment_status;
     }
 
-    // public List<Attachments> getAttachments() {
-    // return attachments;
-    // }
+    public List<Attachments> getAttachments() {
+        return attachments;
+    }
 
     public void setAttachments(List<Attachments> attachments) {
-        // this.attachments = attachments;
+        this.attachments = attachments;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        // result = prime * result + ((attachments == null) ? 0 : attachments.hashCode());
+        result = prime * result + ((attachments == null) ? 0 : attachments.hashCode());
         result = prime * result + ((author == null) ? 0 : author.hashCode());
         result = prime * result + ((categories == null) ? 0 : categories.hashCode());
         result = prime * result + comment_count;
@@ -237,10 +237,13 @@ public class Post {
         if (getClass() != obj.getClass())
             return false;
         Post other = (Post) obj;
-        /*
-         * if (attachments == null) { if (other.attachments != null) return false; } else if
-         * (!attachments.equals(other.attachments)) return false;
-         */
+
+        if (attachments == null) {
+            if (other.attachments != null)
+                return false;
+        } else if (!attachments.equals(other.attachments))
+            return false;
+
         if (author == null) {
             if (other.author != null)
                 return false;
@@ -329,7 +332,7 @@ public class Post {
                 + ", title=" + title + ", title_plain=" + title_plain + ", content=" + content + ", excerpt=" + excerpt
                 + ", date=" + date + ", modified=" + modified + ", categories=" + categories + ", tags=" + tags
                 + ", author=" + author + ", comments=" + comments + ", comment_count=" + comment_count
-                + ", comment_status=" + comment_status + ", attachments=" + "]";
+                + ", comment_status=" + comment_status + ", attachments=" + attachments + "]";
     }
 
     public String getCommentCountString() {
@@ -347,17 +350,19 @@ public class Post {
 
     public String getFeaturedImage() {
         String imageUrl = null;
-        /*
-         * if ([self.thumbnail length]) { return self.thumbnail; }
-         */
-        /*
-         * if (attachments.size() > 0) { AttachmentItem image = (AttachmentItem) ((Attachments)
-         * attachments.get(0)).getImages().get(0);
-         * 
-         * if (image != null) { Image thumbnail = image.getThumbnail();
-         * 
-         * if (thumbnail != null) { imageUrl = thumbnail.getUrl(); } } }
-         */
+
+        if (attachments.size() > 0) {
+            AttachmentItem image = (AttachmentItem) ((Attachments) attachments.get(0)).getImages();
+
+            if (image != null) {
+                Image thumbnail = image.getMedium();
+
+                if (thumbnail != null) {
+                    imageUrl = thumbnail.getUrl();
+                }
+            }
+        }
+
         return imageUrl;
     }
 }

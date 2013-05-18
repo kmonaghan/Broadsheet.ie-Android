@@ -1,7 +1,5 @@
 package ie.broadsheet.app.model.json;
 
-import java.util.List;
-
 import com.google.api.client.util.Key;
 
 public class Attachments {
@@ -30,7 +28,7 @@ public class Attachments {
     private String mime_type;
 
     @Key
-    private List<AttachmentItem> images;
+    private AttachmentItem images;
 
     public int getId() {
         return id;
@@ -96,11 +94,11 @@ public class Attachments {
         this.mime_type = mime_type;
     }
 
-    public List<AttachmentItem> getImages() {
+    public AttachmentItem getImages() {
         return images;
     }
 
-    public void setImages(List<AttachmentItem> images) {
+    public void setImages(AttachmentItem images) {
         this.images = images;
     }
 
