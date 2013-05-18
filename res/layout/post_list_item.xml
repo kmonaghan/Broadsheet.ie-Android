@@ -45,6 +45,7 @@
         android:contentDescription="@string/large_post_image"
         android:minHeight="@dimen/large_post_image_height"
         android:minWidth="@dimen/large_post_image_width"
-        android:src="@drawable/default_post_image" />
+        android:src="@drawable/default_post_image"
+        android:scaleType="centerCrop" />
 
 </LinearLayout>
