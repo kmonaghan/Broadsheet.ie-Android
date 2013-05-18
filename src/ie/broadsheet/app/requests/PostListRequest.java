@@ -1,6 +1,10 @@
 package ie.broadsheet.app.requests;
 
 import ie.broadsheet.app.model.json.PostList;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import android.util.Log;
 
 import com.google.api.client.http.GenericUrl;
@@ -15,12 +19,22 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
 
     private int count = 10;
 
+    private String searchTerm;
+
     public int getPage() {
         return page;
     }
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
     }
 
     public PostListRequest() {
@@ -46,6 +60,15 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
         }
 
         generatedURL += "&count=" + Integer.toString(count);
+
+        if ((searchTerm != null) && (searchTerm.length() > 0)) {
+            try {
+                generatedURL += "&s=" + URLEncoder.encode(searchTerm, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
         return generatedURL;
     }

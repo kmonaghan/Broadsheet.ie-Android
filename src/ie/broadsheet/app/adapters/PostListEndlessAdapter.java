@@ -16,9 +16,13 @@ import com.octo.android.robospice.request.listener.RequestListener;
 public class PostListEndlessAdapter extends EndlessAdapter {
     private static final String TAG = "PostListEndlessAdapter";
 
-    boolean hasMore = true;
+    private boolean hasMore = true;
 
-    int currentPage = 0;
+    private boolean loaded = false;
+
+    private int currentPage = 0;
+
+    private String searchTerm;
 
     private PostListRequest postListRequest;
 
@@ -26,8 +30,6 @@ public class PostListEndlessAdapter extends EndlessAdapter {
         super(context, new PostListAdapter(context), R.layout.post_list_load_more);
 
         setRunInBackground(false);
-
-        fetchPosts();
     }
 
     @Override
@@ -45,11 +47,36 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
     }
 
-    private void fetchPosts() {
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
+
+    public void reset() {
+        loaded = false;
+        hasMore = true;
+        searchTerm = null;
+        currentPage = 0;
+        ((PostListAdapter) getWrappedAdapter()).clear();
+    }
+
+    public void fetchPosts() {
         if (postListRequest == null) {
             postListRequest = new PostListRequest();
 
             postListRequest.setPage(currentPage);
+            postListRequest.setSearchTerm(searchTerm);
 
             BaseFragmentActivity activity = (BaseFragmentActivity) getContext();
 
@@ -72,6 +99,8 @@ public class PostListEndlessAdapter extends EndlessAdapter {
         @Override
         public void onRequestSuccess(final PostList result) {
             Log.d(TAG, "we got results");
+
+            loaded = true;
 
             hasMore = (result.getCount_total() > result.getCount());
 

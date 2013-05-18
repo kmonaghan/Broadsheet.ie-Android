@@ -4,14 +4,14 @@ import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 
 /**
  * A list fragment representing a list of Posts. This fragment also supports tablet devices by allowing list items to be
@@ -20,7 +20,7 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
  * <p>
  * Activities containing this fragment MUST implement the {@link Callbacks} interface.
  */
-public class PostListFragment extends SherlockListFragment {
+public class PostListFragment extends SherlockListFragment implements OnQueryTextListener {
     private static final String TAG = "PostListFragment";
 
     /**
@@ -35,6 +35,8 @@ public class PostListFragment extends SherlockListFragment {
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
     private Callbacks mCallbacks;
+
+    private PostListEndlessAdapter postListAdapter;
 
     /**
      * A callback interface that all activities containing this fragment must implement. This mechanism allows
@@ -52,14 +54,14 @@ public class PostListFragment extends SherlockListFragment {
      * changes).
      */
     public PostListFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PostListEndlessAdapter postListAdapter = new PostListEndlessAdapter(this.getActivity());
+        postListAdapter = new PostListEndlessAdapter(this.getActivity());
         setListAdapter(postListAdapter);
-        // getListView().setScrollBarStyle(ListView.SCROLLBARS_OUTSIDE_OVERLAY);
     }
 
     @Override
@@ -78,6 +80,9 @@ public class PostListFragment extends SherlockListFragment {
     public void onResume() {
         super.onResume();
 
+        if (!postListAdapter.isLoaded()) {
+            postListAdapter.fetchPosts();
+        }
     }
 
     @Override
@@ -101,18 +106,9 @@ public class PostListFragment extends SherlockListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
-
-        // set up a listener for the refresh item
-        final MenuItem refresh = (MenuItem) menu.findItem(R.id.menu_refresh);
-        refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-            // on selecting show progress spinner for 1s
-            public boolean onMenuItemClick(MenuItem item) {
-                return true;
-            }
-        });
-
         super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.main, menu);
     }
 
     @Override
@@ -151,6 +147,21 @@ public class PostListFragment extends SherlockListFragment {
         }
 
         mActivatedPosition = position;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        postListAdapter.reset();
+        postListAdapter.setSearchTerm(query);
+        postListAdapter.fetchPosts();
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        Log.i(TAG, "Current search term: " + newText);
+        return false;
     }
 
 }
