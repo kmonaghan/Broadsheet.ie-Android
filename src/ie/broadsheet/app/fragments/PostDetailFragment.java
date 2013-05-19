@@ -1,6 +1,7 @@
 package ie.broadsheet.app.fragments;
 
 import ie.broadsheet.app.BroadsheetApplication;
+import ie.broadsheet.app.CommentListActivity;
 import ie.broadsheet.app.PostDetailActivity;
 import ie.broadsheet.app.PostListActivity;
 import ie.broadsheet.app.R;
@@ -13,18 +14,23 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.ShareActionProvider;
+
 /**
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
-public class PostDetailFragment extends Fragment {
+public class PostDetailFragment extends SherlockFragment {
     /**
      * The fragment argument representing the item ID that this fragment represents.
      */
@@ -32,11 +38,16 @@ public class PostDetailFragment extends Fragment {
 
     private Post post;
 
+    int postIndex;
+
+    private ShareActionProvider mShareActionProvider;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
      * changes).
      */
     public PostDetailFragment() {
+
     }
 
     @Override
@@ -45,9 +56,25 @@ public class PostDetailFragment extends Fragment {
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             BroadsheetApplication app = (BroadsheetApplication) getActivity().getApplication();
-
-            post = app.getPosts().get(getArguments().getInt(ARG_ITEM_ID));
+            postIndex = getArguments().getInt(ARG_ITEM_ID);
+            post = app.getPosts().get(postIndex);
         }
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.posts, menu);
+        /*
+         * MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar); ShareActionProvider
+         * actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+         * actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME); // Note that you
+         * can set/change the intent any time, // say when the user has selected an image.
+         * actionProvider.setShareIntent(createShareIntent());
+         */
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -76,6 +103,28 @@ public class PostDetailFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_view_comments) {
+            Intent commentIntent = new Intent(this.getActivity(), CommentListActivity.class);
+            commentIntent.putExtra(PostDetailFragment.ARG_ITEM_ID, postIndex);
+            startActivity(commentIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private Intent createShareIntent() {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+        String shareBody = post.getTitle() + " - " + post.getUrl();
+
+        sharingIntent.setType("text/plain").putExtra(android.content.Intent.EXTRA_SUBJECT, "Broadsheet.ie")
+                .putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+
+        return sharingIntent;
     }
 
     // Via http://stackoverflow.com/questions/14088623/android-webview-to-play-youtube-videos

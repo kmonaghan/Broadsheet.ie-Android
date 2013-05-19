@@ -11,6 +11,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 
 /**
@@ -109,6 +110,16 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_refresh) {
+            postListAdapter.reset();
+            postListAdapter.fetchPosts();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

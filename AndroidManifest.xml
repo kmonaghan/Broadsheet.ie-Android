@@ -31,11 +31,17 @@
             android:name="ie.broadsheet.app.services.BroadsheetServices"
             android:exported="false" />
 
-        <activity android:name=".PostDetailActivity"
+        <activity
+            android:name="ie.broadsheet.app.PostDetailActivity"
             android:label="@string/title_post_detail"
-            android:parentActivityName=".PostListActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:parentActivityName=".PostListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PostListActivity" />
+        </activity>
+        <activity
+            android:name="ie.broadsheet.app.CommentListActivity"
+            android:label="@string/title_activity_comment_list" >
         </activity>
     </application>
 

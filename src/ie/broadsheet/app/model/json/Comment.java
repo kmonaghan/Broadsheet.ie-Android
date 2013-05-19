@@ -21,6 +21,9 @@ public class Comment {
     @Key
     private int parent;
 
+    @Key
+    private String avatar;
+
     public int getId() {
         return id;
     }
@@ -69,10 +72,19 @@ public class Comment {
         this.parent = parent;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((avatar == null) ? 0 : avatar.hashCode());
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + id;
@@ -91,6 +103,11 @@ public class Comment {
         if (getClass() != obj.getClass())
             return false;
         Comment other = (Comment) obj;
+        if (avatar == null) {
+            if (other.avatar != null)
+                return false;
+        } else if (!avatar.equals(other.avatar))
+            return false;
         if (content == null) {
             if (other.content != null)
                 return false;
@@ -121,7 +138,7 @@ public class Comment {
     @Override
     public String toString() {
         return "Comment [id=" + id + ", name=" + name + ", url=" + url + ", date=" + date + ", content=" + content
-                + ", parent=" + parent + "]";
+                + ", parent=" + parent + ", avatar=" + avatar + "]";
     }
 
 }
