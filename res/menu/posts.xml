@@ -16,8 +16,7 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-        <!-- icon -->
+    <!-- icon -->
     <item
         android:id="@+id/menu_make_comment"
         android:icon="@drawable/ic_compose"
