@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class CommentListActivity extends SherlockListActivity {
     private Post post;
@@ -24,6 +26,22 @@ public class CommentListActivity extends SherlockListActivity {
         }
 
         setListAdapter(new CommentAdapter(this, R.layout.comment_list_item, post.getComments()));
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        EasyTracker.getInstance().activityStart(this); // Add this method.
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        EasyTracker.getInstance().activityStop(this); // Add this method.
     }
 
     @Override
@@ -33,4 +51,12 @@ public class CommentListActivity extends SherlockListActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

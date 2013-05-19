@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +26,16 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.Tracker;
 
 /**
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
 public class PostDetailFragment extends SherlockFragment {
+    private static final String TAG = "PostDetailFragment";
+
     /**
      * The fragment argument representing the item ID that this fragment represents.
      */
@@ -75,6 +80,25 @@ public class PostDetailFragment extends SherlockFragment {
          * can set/change the intent any time, // say when the user has selected an image.
          * actionProvider.setShareIntent(createShareIntent());
          */
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        GoogleAnalytics mGaInstance = GoogleAnalytics.getInstance(getActivity());
+
+        if (mGaInstance != null) {
+            Tracker mGaTracker = mGaInstance.getDefaultTracker();
+            if (mGaTracker != null) {
+                mGaTracker.sendView(post.getTitle());
+                Log.d(TAG, "Logged view");
+            } else {
+                Log.d(TAG, "no GA Tracker instance");
+            }
+        } else {
+            Log.d(TAG, "no GA instance");
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
