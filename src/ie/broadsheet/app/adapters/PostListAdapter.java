@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 public class PostListAdapter extends ArrayAdapter<Post> {
     // private static final String TAG = "PostListAdapter";
@@ -37,9 +38,8 @@ public class PostListAdapter extends ArrayAdapter<Post> {
         View v = convertView;
 
         ViewHolder holder;
+        Activity activity = (Activity) getContext();
         if (v == null) {
-            Activity activity = (Activity) getContext();
-
             LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.post_list_item, null);
             holder = new ViewHolder();
@@ -48,8 +48,10 @@ public class PostListAdapter extends ArrayAdapter<Post> {
             holder.commentCountView = (TextView) v.findViewById(R.id.comment_count);
             holder.featuredImage = (ImageView) v.findViewById(R.id.featuredImage);
             v.setTag(holder);
-        } else
+        } else {
             holder = (ViewHolder) v.getTag();
+            holder.featuredImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.default_post_image));
+        }
 
         final Post post = getItem(position);
         if (post != null) {
@@ -61,9 +63,12 @@ public class PostListAdapter extends ArrayAdapter<Post> {
             String featuredImage = post.getFeaturedImage();
 
             if ((featuredImage != null) && (featuredImage.length() > 0)) {
-                DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory().cacheOnDisc()
-
-                .build();
+                DisplayImageOptions options = new DisplayImageOptions.Builder()
+                        .cacheInMemory()
+                        .cacheOnDisc()
+                        .displayer(
+                                new RoundedBitmapDisplayer(activity.getResources().getDimensionPixelSize(
+                                        R.dimen.standard_corner_radius))).build();
                 ImageLoader.getInstance().displayImage(featuredImage, holder.featuredImage, options);
             }
         }
