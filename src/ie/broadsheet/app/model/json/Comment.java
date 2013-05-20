@@ -24,6 +24,9 @@ public class Comment {
     @Key
     private String avatar;
 
+    @Key
+    private String status;
+
     public int getId() {
         return id;
     }
@@ -80,6 +83,14 @@ public class Comment {
         this.avatar = avatar;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -90,6 +101,7 @@ public class Comment {
         result = prime * result + id;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + parent;
+        result = prime * result + ((status == null) ? 0 : status.hashCode());
         result = prime * result + ((url == null) ? 0 : url.hashCode());
         return result;
     }
@@ -127,6 +139,11 @@ public class Comment {
             return false;
         if (parent != other.parent)
             return false;
+        if (status == null) {
+            if (other.status != null)
+                return false;
+        } else if (!status.equals(other.status))
+            return false;
         if (url == null) {
             if (other.url != null)
                 return false;
@@ -138,7 +155,7 @@ public class Comment {
     @Override
     public String toString() {
         return "Comment [id=" + id + ", name=" + name + ", url=" + url + ", date=" + date + ", content=" + content
-                + ", parent=" + parent + ", avatar=" + avatar + "]";
+                + ", parent=" + parent + ", avatar=" + avatar + ", status=" + status + "]";
     }
 
 }

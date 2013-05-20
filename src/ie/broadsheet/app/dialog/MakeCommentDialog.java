@@ -1,22 +1,36 @@
 package ie.broadsheet.app.dialog;
 
 import ie.broadsheet.app.R;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 
 public class MakeCommentDialog extends SherlockDialogFragment {
 
-    public interface NoticeDialogListener {
-        public void onDialogPositiveClick(SherlockDialogFragment dialog);
+    public interface MakeCommentDialogListener {
+        public void onDialogPositiveClick(String email, String commenterName, String commentBody);
     }
 
-    NoticeDialogListener mListener;
+    MakeCommentDialogListener mListener;
+
+    private EditText email;
+
+    private EditText commenterName;
+
+    private EditText commentBody;
+
+    public MakeCommentDialogListener getmListener() {
+        return mListener;
+    }
+
+    public void setmListener(MakeCommentDialogListener mListener) {
+        this.mListener = mListener;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -31,26 +45,28 @@ public class MakeCommentDialog extends SherlockDialogFragment {
                 .setPositiveButton(R.string.comment, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
+                        email = (EditText) ((Dialog) dialog).findViewById(R.id.commenterEmail);
+                        commenterName = (EditText) ((Dialog) dialog).findViewById(R.id.commenterName);
+                        commentBody = (EditText) ((Dialog) dialog).findViewById(R.id.commentBody);
+
+                        mListener.onDialogPositiveClick(email.getText().toString(), commenterName.getText().toString(),
+                                commentBody.getText().toString());
                     }
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         MakeCommentDialog.this.getDialog().cancel();
                     }
                 });
+        /*
+         * Dialog dialogView = builder.create();
+         * 
+         * email = (EditText) dialogView.findViewById(R.id.commenterEmail); commenterName = (EditText)
+         * dialogView.findViewById(R.id.commenterName); commentBody = (EditText)
+         * dialogView.findViewById(R.id.commentBody);
+         * 
+         * return dialogView;
+         */
         return builder.create();
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Verify that the host activity implements the callback interface
-        try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (NoticeDialogListener) activity;
-        } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString() + " must implement NoticeDialogListener");
-        }
-    }
 }
