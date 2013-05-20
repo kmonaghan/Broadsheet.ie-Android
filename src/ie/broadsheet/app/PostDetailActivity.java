@@ -5,15 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 /**
  * An activity representing a single Post detail screen. This activity is only used on handset devices. On tablet-size
  * devices, item details are presented side-by-side with a list of items in a {@link PostListActivity}.
  * <p>
  * This activity is mostly just a 'shell' activity containing nothing more than a {@link PostDetailFragment}.
  */
-public class PostDetailActivity extends SherlockFragmentActivity {
+public class PostDetailActivity extends BaseFragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
