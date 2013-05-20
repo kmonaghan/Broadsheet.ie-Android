@@ -15,4 +15,8 @@
     <string name="title_activity_comment_list">CommentListActivity</string>
 	<string name="share_label">Share</string>
 	<string name="user_avatar">User avatar</string>
+	<string name="comment">Comment</string>
+	<string name="cancel">Cancel</string>
+	<string name="commenter_name_hint">Your name</string>
+	<string name="commenter_email">Your email address</string>
 </resources>

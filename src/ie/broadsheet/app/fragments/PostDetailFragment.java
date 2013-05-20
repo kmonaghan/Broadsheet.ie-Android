@@ -5,6 +5,7 @@ import ie.broadsheet.app.CommentListActivity;
 import ie.broadsheet.app.PostDetailActivity;
 import ie.broadsheet.app.PostListActivity;
 import ie.broadsheet.app.R;
+import ie.broadsheet.app.dialog.MakeCommentDialog;
 import ie.broadsheet.app.model.json.Post;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -33,7 +36,7 @@ import com.google.analytics.tracking.android.Tracker;
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
-public class PostDetailFragment extends SherlockFragment {
+public class PostDetailFragment extends SherlockFragment implements MakeCommentDialog.NoticeDialogListener {
     private static final String TAG = "PostDetailFragment";
 
     /**
@@ -136,6 +139,9 @@ public class PostDetailFragment extends SherlockFragment {
             commentIntent.putExtra(PostDetailFragment.ARG_ITEM_ID, postIndex);
             startActivity(commentIntent);
             return true;
+        } else if (item.getItemId() == R.id.menu_make_comment) {
+            DialogFragment dialog = new MakeCommentDialog();
+            dialog.show(getActivity().getSupportFragmentManager(), "MakeCommentDialog");
         }
         return super.onOptionsItemSelected(item);
     }
@@ -149,6 +155,11 @@ public class PostDetailFragment extends SherlockFragment {
                 .putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
 
         return sharingIntent;
+    }
+
+    @Override
+    public void onDialogPositiveClick(SherlockDialogFragment dialog) {
+        // User touched the dialog's positive button
     }
 
     // Via http://stackoverflow.com/questions/14088623/android-webview-to-play-youtube-videos
