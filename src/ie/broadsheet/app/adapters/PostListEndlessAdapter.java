@@ -64,6 +64,10 @@ public class PostListEndlessAdapter extends EndlessAdapter {
     }
 
     public void reset() {
+        BroadsheetApplication app = (BroadsheetApplication) PostListEndlessAdapter.this.getContext()
+                .getApplicationContext();
+        app.setPosts(null);
+
         loaded = false;
         hasMore = true;
         searchTerm = null;

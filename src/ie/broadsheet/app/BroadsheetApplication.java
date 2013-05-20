@@ -18,7 +18,9 @@ public class BroadsheetApplication extends Application {
     }
 
     public void setPosts(List<Post> posts) {
-        if (this.posts.size() > 0) {
+        if ((this.posts == null) || (posts == null)) {
+            this.posts = posts;
+        } else if (this.posts.size() > 0) {
             this.posts.addAll(posts);
         } else {
             this.posts = posts;
