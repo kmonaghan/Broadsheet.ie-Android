@@ -16,7 +16,7 @@ public class MakeCommentDialog extends SherlockDialogFragment {
         public void onDialogPositiveClick(String email, String commenterName, String commentBody);
     }
 
-    MakeCommentDialogListener mListener;
+    private MakeCommentDialogListener mListener;
 
     private EditText email;
 
@@ -51,21 +51,15 @@ public class MakeCommentDialog extends SherlockDialogFragment {
 
                         mListener.onDialogPositiveClick(email.getText().toString(), commenterName.getText().toString(),
                                 commentBody.getText().toString());
+
+                        dialog.dismiss();
                     }
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         MakeCommentDialog.this.getDialog().cancel();
                     }
                 });
-        /*
-         * Dialog dialogView = builder.create();
-         * 
-         * email = (EditText) dialogView.findViewById(R.id.commenterEmail); commenterName = (EditText)
-         * dialogView.findViewById(R.id.commenterName); commentBody = (EditText)
-         * dialogView.findViewById(R.id.commentBody);
-         * 
-         * return dialogView;
-         */
+
         return builder.create();
     }
 
