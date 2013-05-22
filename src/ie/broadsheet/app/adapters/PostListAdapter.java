@@ -57,7 +57,7 @@ public class PostListAdapter extends ArrayAdapter<Post> {
         if (post != null) {
 
             holder.titleView.setText(Html.fromHtml(post.getTitle_plain()));
-            holder.dateView.setText(post.getDate());
+            holder.dateView.setText(post.getRelativeTime());
             holder.commentCountView.setText(post.getCommentCountString());
 
             String featuredImage = post.getFeaturedImage();

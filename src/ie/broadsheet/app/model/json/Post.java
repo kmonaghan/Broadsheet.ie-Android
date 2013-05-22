@@ -1,6 +1,12 @@
 package ie.broadsheet.app.model.json;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import android.annotation.SuppressLint;
+import android.text.format.DateUtils;
 
 import com.google.api.client.util.Key;
 
@@ -364,5 +370,22 @@ public class Post {
         }
 
         return imageUrl;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public String getRelativeTime() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date result = null;
+        try {
+            result = df.parse(this.date);
+            return (String) DateUtils.getRelativeTimeSpanString(result.getTime(), new Date().getTime(),
+                    DateUtils.MINUTE_IN_MILLIS);
+
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }
