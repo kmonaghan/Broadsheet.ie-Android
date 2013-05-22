@@ -2,10 +2,14 @@ package ie.broadsheet.app.fragments;
 
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
+import ie.broadsheet.app.adapters.PostListEndlessAdapter.PostListLoadedListener;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
@@ -13,6 +17,9 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 /**
  * A list fragment representing a list of Posts. This fragment also supports tablet devices by allowing list items to be
@@ -21,7 +28,7 @@ import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
  * <p>
  * Activities containing this fragment MUST implement the {@link Callbacks} interface.
  */
-public class PostListFragment extends SherlockListFragment implements OnQueryTextListener {
+public class PostListFragment extends SherlockListFragment implements OnQueryTextListener, PostListLoadedListener {
     private static final String TAG = "PostListFragment";
 
     /**
@@ -38,6 +45,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     private Callbacks mCallbacks;
 
     private PostListEndlessAdapter postListAdapter;
+
+    private PullToRefreshListView mPullRefreshListView;
 
     /**
      * A callback interface that all activities containing this fragment must implement. This mechanism allows
@@ -62,7 +71,36 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         postListAdapter = new PostListEndlessAdapter(this.getActivity());
+        postListAdapter.setPostListLoadedListener(this);
         setListAdapter(postListAdapter);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View layout = super.onCreateView(inflater, container, savedInstanceState);
+
+        // Get original ListView and Frame
+        ListView originalLv = (ListView) layout.findViewById(android.R.id.list);
+        ViewGroup frame = (ViewGroup) originalLv.getParent();
+
+        // Remove old ListView
+        frame.removeView(originalLv);
+
+        // Create new PullToRefreshListView and add to Frame
+        mPullRefreshListView = new PullToRefreshListView(getActivity());
+        frame.addView(mPullRefreshListView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mPullRefreshListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                postListAdapter.reset();
+                postListAdapter.fetchPosts();
+            }
+        });
+
+        return layout;
     }
 
     @Override
@@ -173,6 +211,11 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     public boolean onQueryTextChange(String newText) {
         Log.i(TAG, "Current search term: " + newText);
         return false;
+    }
+
+    @Override
+    public void onPostListLoaded() {
+        mPullRefreshListView.onRefreshComplete();
     }
 
 }

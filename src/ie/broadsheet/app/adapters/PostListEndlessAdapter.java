@@ -14,6 +14,12 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 public class PostListEndlessAdapter extends EndlessAdapter {
+    public interface PostListLoadedListener {
+        public void onPostListLoaded();
+    }
+
+    private PostListLoadedListener postListLoadedListener;
+
     private static final String TAG = "PostListEndlessAdapter";
 
     private boolean hasMore = true;
@@ -63,16 +69,21 @@ public class PostListEndlessAdapter extends EndlessAdapter {
         this.searchTerm = searchTerm;
     }
 
+    public PostListLoadedListener getPostListLoadedListener() {
+        return postListLoadedListener;
+    }
+
+    public void setPostListLoadedListener(PostListLoadedListener mListener) {
+        this.postListLoadedListener = mListener;
+    }
+
     public void reset() {
-        BroadsheetApplication app = (BroadsheetApplication) PostListEndlessAdapter.this.getContext()
-                .getApplicationContext();
-        app.setPosts(null);
 
         loaded = false;
         hasMore = true;
         searchTerm = null;
         currentPage = 0;
-        ((PostListAdapter) getWrappedAdapter()).clear();
+
     }
 
     public void fetchPosts() {
@@ -108,14 +119,20 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
             hasMore = (result.getCount_total() > result.getCount());
 
+            BroadsheetApplication app = (BroadsheetApplication) PostListEndlessAdapter.this.getContext()
+                    .getApplicationContext();
+            if (PostListEndlessAdapter.this.currentPage == 0) {
+                app.setPosts(null);
+                ((PostListAdapter) getWrappedAdapter()).clear();
+            }
+            app.setPosts(result.getPosts());
+
             ((PostListAdapter) getWrappedAdapter()).addAll(result.getPosts());
             onDataReady();
 
             postListRequest = null;
 
-            BroadsheetApplication app = (BroadsheetApplication) PostListEndlessAdapter.this.getContext()
-                    .getApplicationContext();
-            app.setPosts(result.getPosts());
+            PostListEndlessAdapter.this.postListLoadedListener.onPostListLoaded();
         }
     }
 }
