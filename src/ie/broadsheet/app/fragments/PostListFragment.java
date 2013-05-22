@@ -21,6 +21,8 @@ import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 /**
  * A list fragment representing a list of Posts. This fragment also supports tablet devices by allowing list items to be
@@ -74,6 +76,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         postListAdapter = new PostListEndlessAdapter(this.getActivity());
         postListAdapter.setPostListLoadedListener(this);
         setListAdapter(postListAdapter);
+
     }
 
     @Override
@@ -99,6 +102,12 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
                 postListAdapter.fetchPosts();
             }
         });
+
+        boolean pauseOnScroll = false; // or true
+        boolean pauseOnFling = true; // or false
+        PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll,
+                pauseOnFling);
+        mPullRefreshListView.setOnScrollListener(listener);
 
         return layout;
     }
@@ -169,6 +178,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         mCallbacks.onItemSelected(position);
+
     }
 
     @Override
