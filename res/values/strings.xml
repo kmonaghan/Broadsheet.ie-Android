@@ -16,7 +16,9 @@
 	<string name="share_label">Share</string>
 	<string name="user_avatar">User avatar</string>
 	<string name="comment">Comment</string>
+	<string name="okay">Okay</string>
 	<string name="cancel">Cancel</string>
 	<string name="commenter_name_hint">Your name</string>
 	<string name="commenter_email">Your email address</string>
+	<string name="about_title">About</string>
 </resources>

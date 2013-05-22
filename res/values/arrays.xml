@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="about_array">
+        <item>About Us</item>
+        <item>Rate this app</item>
+        <item>About the developer</item>
+        <item>3rd Party Libraries</item>
+        <item>Contact us</item>
+    </string-array>
+
+</resources>

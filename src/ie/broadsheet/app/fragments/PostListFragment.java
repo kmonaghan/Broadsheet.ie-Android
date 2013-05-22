@@ -3,6 +3,7 @@ package ie.broadsheet.app.fragments;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter.PostListLoadedListener;
+import ie.broadsheet.app.dialog.AboutDialog;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -73,7 +74,6 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         postListAdapter = new PostListEndlessAdapter(this.getActivity());
         postListAdapter.setPostListLoadedListener(this);
         setListAdapter(postListAdapter);
-
     }
 
     @Override
@@ -152,11 +152,13 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_refresh) {
-            postListAdapter.reset();
-            postListAdapter.fetchPosts();
+
+        if (item.getItemId() == R.id.menu_view_about) {
+            AboutDialog dialog = new AboutDialog();
+            dialog.show(getActivity().getSupportFragmentManager(), "AboutDialog");
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
