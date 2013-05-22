@@ -53,6 +53,8 @@ public class PostListActivity extends BaseFragmentActivity implements PostListFr
      */
     @Override
     public void onItemSelected(int id) {
+        // Since we're using a pull to refresh, the posts are off by 1
+        id--;
         if (mTwoPane) {
             Log.d(TAG, "updating a fragment");
             // In two-pane mode, show the detail view in this activity by
@@ -65,7 +67,7 @@ public class PostListActivity extends BaseFragmentActivity implements PostListFr
             getSupportFragmentManager().beginTransaction().replace(R.id.post_detail_container, fragment).commit();
 
         } else {
-            Log.d(TAG, "starting an activity");
+            Log.d(TAG, "starting an activity for post at position: " + Integer.toString(id));
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, PostDetailActivity.class);
