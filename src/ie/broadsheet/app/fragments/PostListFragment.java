@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -17,6 +18,8 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.actionbarsherlock.widget.SearchView.OnCloseListener;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
@@ -31,7 +34,8 @@ import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
  * <p>
  * Activities containing this fragment MUST implement the {@link Callbacks} interface.
  */
-public class PostListFragment extends SherlockListFragment implements OnQueryTextListener, PostListLoadedListener {
+public class PostListFragment extends SherlockListFragment implements OnQueryTextListener, PostListLoadedListener,
+        OnClickListener, OnCloseListener {
     private static final String TAG = "PostListFragment";
 
     /**
@@ -50,6 +54,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     private PostListEndlessAdapter postListAdapter;
 
     private PullToRefreshListView mPullRefreshListView;
+
+    private SearchView searchView;
 
     /**
      * A callback interface that all activities containing this fragment must implement. This mechanism allows
@@ -157,6 +163,11 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.main, menu);
+
+        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnSearchClickListener(this);
+        searchView.setOnCloseListener(this);
     }
 
     @Override
@@ -212,9 +223,12 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        Log.i(TAG, "Query to search for: " + query);
         postListAdapter.reset();
         postListAdapter.setSearchTerm(query);
         postListAdapter.fetchPosts();
+
+        searchView.clearFocus();
 
         return false;
     }
@@ -226,8 +240,19 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     }
 
     @Override
+    public boolean onClose() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
     public void onPostListLoaded() {
         mPullRefreshListView.onRefreshComplete();
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 
 }
