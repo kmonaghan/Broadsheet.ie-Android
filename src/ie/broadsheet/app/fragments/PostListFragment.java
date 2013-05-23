@@ -109,8 +109,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
             }
         });
 
-        boolean pauseOnScroll = false; // or true
-        boolean pauseOnFling = true; // or false
+        boolean pauseOnScroll = false;
+        boolean pauseOnFling = true;
         PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll,
                 pauseOnFling);
         mPullRefreshListView.setOnScrollListener(listener);

@@ -65,6 +65,8 @@ public class Post {
     @Key
     private List<Attachments> attachments;
 
+    private String relativeTime;
+
     public int getId() {
         return id;
     }
@@ -374,18 +376,20 @@ public class Post {
 
     @SuppressLint("SimpleDateFormat")
     public String getRelativeTime() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date result = null;
-        try {
-            result = df.parse(this.date);
-            return (String) DateUtils.getRelativeTimeSpanString(result.getTime(), new Date().getTime(),
-                    DateUtils.MINUTE_IN_MILLIS);
+        if (relativeTime == null) {
+            relativeTime = "";
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date result = null;
+            try {
+                result = df.parse(this.date);
+                relativeTime = (String) DateUtils.getRelativeTimeSpanString(result.getTime(), new Date().getTime(),
+                        DateUtils.MINUTE_IN_MILLIS);
 
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-
-        return "";
+        return relativeTime;
     }
 }

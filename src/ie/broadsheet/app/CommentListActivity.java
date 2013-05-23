@@ -8,6 +8,8 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 public class CommentListActivity extends SherlockListActivity {
     private Post post;
@@ -28,6 +30,12 @@ public class CommentListActivity extends SherlockListActivity {
         setListAdapter(new CommentAdapter(this, R.layout.comment_list_item, post.getComments()));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        boolean pauseOnScroll = false;
+        boolean pauseOnFling = true;
+        PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll,
+                pauseOnFling);
+        getListView().setOnScrollListener(listener);
     }
 
     @Override

@@ -74,7 +74,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             }
 
             holder.commentUser.setText(comment.getName());
-            holder.commentDate.setText(comment.getDate());
+            holder.commentDate.setText(comment.getRelativeTime());
             holder.commentBody.setText(Html.fromHtml(comment.getContent()));
 
         }

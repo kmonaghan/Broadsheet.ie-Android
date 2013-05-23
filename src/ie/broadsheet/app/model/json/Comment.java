@@ -1,5 +1,12 @@
 package ie.broadsheet.app.model.json;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.annotation.SuppressLint;
+import android.text.format.DateUtils;
+
 import com.google.api.client.util.Key;
 
 public class Comment {
@@ -26,6 +33,8 @@ public class Comment {
 
     @Key
     private String status;
+
+    private String relativeTime;
 
     public int getId() {
         return id;
@@ -158,4 +167,22 @@ public class Comment {
                 + ", parent=" + parent + ", avatar=" + avatar + ", status=" + status + "]";
     }
 
+    @SuppressLint("SimpleDateFormat")
+    public String getRelativeTime() {
+        if (relativeTime == null) {
+            relativeTime = "";
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date result = null;
+            try {
+                result = df.parse(this.date);
+                relativeTime = (String) DateUtils.getRelativeTimeSpanString(result.getTime(), new Date().getTime(),
+                        DateUtils.MINUTE_IN_MILLIS);
+
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return relativeTime;
+    }
 }
