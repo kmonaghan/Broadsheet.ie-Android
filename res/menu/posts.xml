@@ -16,18 +16,25 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
     <!-- icon -->
     <item
         android:id="@+id/menu_make_comment"
         android:icon="@drawable/ic_compose"
         android:showAsAction="ifRoom"
         android:title="@string/action_label_compose"/>
-    
+
     <!-- icon -->
     <item
         android:id="@+id/menu_view_comments"
         android:icon="@drawable/ic_social_chat"
         android:showAsAction="ifRoom"
         android:title="@string/action_label_refresh"/>
+    <item
+        android:id="@+id/menu_item_share_action_provider_action_bar"
+        android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"
+        android:icon="@drawable/ic_action_share"
+        android:showAsAction="always"
+        android:title="@string/share_label"/>
 
 </menu>

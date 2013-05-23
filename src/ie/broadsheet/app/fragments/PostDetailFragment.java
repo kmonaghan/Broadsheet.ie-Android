@@ -52,7 +52,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     int postIndex;
 
-    private ShareActionProvider mShareActionProvider;
+    private ShareActionProvider actionProvider;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
@@ -73,6 +73,8 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         }
 
         setHasOptionsMenu(true);
+
+        getActivity().setTitle("");
     }
 
     @Override
@@ -80,13 +82,13 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.posts, menu);
-        /*
-         * MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar); ShareActionProvider
-         * actionProvider = (ShareActionProvider) actionItem.getActionProvider();
-         * actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME); // Note that you
-         * can set/change the intent any time, // say when the user has selected an image.
-         * actionProvider.setShareIntent(createShareIntent());
-         */
+
+        MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+
+        actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+        actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+
+        actionProvider.setShareIntent(createShareIntent());
     }
 
     @Override
@@ -238,7 +240,6 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     @Override
     public void onDialogPositiveClick(String email, String commenterName, String commentBody) {
-        // TODO Auto-generated method stub
         MakeCommentRequest makeCommentRequest = new MakeCommentRequest();
         makeCommentRequest.setPostId(post.getId());
         makeCommentRequest.setEmail(email);
@@ -258,7 +259,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Log.d(TAG, "Failed to get results");
+            Log.d(TAG, "Failed to get results: " + spiceException.toString());
         }
 
         @Override
