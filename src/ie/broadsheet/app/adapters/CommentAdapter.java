@@ -58,7 +58,13 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             holder.commentAvatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.default_user));
         }
 
+        int standardMargin = activity.getResources().getDimensionPixelSize(R.dimen.standard_margin);
+
         final Comment comment = getItem(position);
+
+        int newMargin = standardMargin + (standardMargin * 2 * comment.getChildLevel());
+        v.setPadding(newMargin, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
+
         if (comment != null) {
             String avatar = comment.getAvatar();
 

@@ -2,15 +2,23 @@ package ie.broadsheet.app.model.json;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import android.annotation.SuppressLint;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.google.api.client.util.Key;
 
 public class Post {
+    private static final String TAG = "Post";
+
     @Key
     private int id;
 
@@ -55,6 +63,8 @@ public class Post {
 
     @Key
     private List<Comment> comments;
+
+    private List<Comment> sortedComments = null;
 
     @Key
     private int comment_count;
@@ -391,5 +401,90 @@ public class Post {
             }
         }
         return relativeTime;
+    }
+
+    public List<Comment> getSortedComments() {
+        if (sortedComments == null) {
+            sortComments();
+        }
+
+        return sortedComments;
+    }
+
+    private void sortComments() {
+        TreeMap<String, Comment> allCommentsMap = new TreeMap<String, Comment>();
+        for (Iterator<Comment> iterator = comments.iterator(); iterator.hasNext();) {
+            Comment item = (Comment) iterator.next();
+
+            item.setChildComment(new TreeMap<String, Comment>());
+            allCommentsMap.put(Integer.toString(item.getId()), item);
+        }
+
+        TreeMap<String, Comment> commentParents = new TreeMap<String, Comment>();
+
+        TreeMap<String, Comment> allComments = new TreeMap<String, Comment>();
+
+        SortedSet<String> keys = new TreeSet<String>(allCommentsMap.keySet());
+        for (String key : keys) {
+            Comment comment = allCommentsMap.get(key);
+
+            if (comment.getParent() > 0) {
+                Comment parentComment = allCommentsMap.get(Integer.toString(comment.getParent()));
+
+                if (parentComment != null) {
+                    if (parentComment.getChildComment().size() > 0) {
+                        parentComment.getChildComment().put(key, comment);
+                    } else {
+                        TreeMap<String, Comment> childer = new TreeMap<String, Comment>();
+                        childer.put(key, comment);
+                        parentComment.setChildComment(childer);
+                    }
+
+                    comment.setChildLevel(parentComment.getChildLevel() + 1);
+
+                    allComments.put(Integer.toString(parentComment.getId()), parentComment);
+                } else {
+                    commentParents.put(key, comment);
+                }
+            } else {
+                commentParents.put(key, comment);
+            }
+        }
+
+        sortedComments = new ArrayList<Comment>();
+
+        SortedSet<String> parentkeys = new TreeSet<String>(allCommentsMap.keySet());
+        for (String key : parentkeys) {
+            Comment comment = commentParents.get(key);
+
+            if (comment != null) {
+                sortedComments.add(comment);
+
+                if ((comment.getChildComment() != null) && (comment.getChildComment().size() > 0)) {
+                    sortedComments.addAll(flattenComments(comment.getChildComment()));
+                }
+            } else {
+                Log.d(TAG, "comment is null?");
+            }
+        }
+
+    }
+
+    public List<Comment> flattenComments(TreeMap<String, Comment> comments) {
+        List<Comment> flattened = new ArrayList<Comment>();
+
+        SortedSet<String> parentkeys = new TreeSet<String>(comments.keySet());
+        for (String key : parentkeys) {
+            Comment comment = comments.get(key);
+
+            flattened.add(comment);
+
+            if (comment.getChildComment().size() > 0) {
+                flattened.addAll(flattenComments(comment.getChildComment()));
+            }
+        }
+
+        return flattened;
+
     }
 }

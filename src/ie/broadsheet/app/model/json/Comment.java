@@ -3,6 +3,7 @@ package ie.broadsheet.app.model.json;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
 import android.text.format.DateUtils;
@@ -35,6 +36,10 @@ public class Comment {
     private String status;
 
     private String relativeTime;
+
+    private TreeMap<String, Comment> childComment;
+
+    private int childLevel = 0;
 
     public int getId() {
         return id;
@@ -98,6 +103,22 @@ public class Comment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public TreeMap<String, Comment> getChildComment() {
+        return childComment;
+    }
+
+    public void setChildComment(TreeMap<String, Comment> childComment) {
+        this.childComment = childComment;
+    }
+
+    public int getChildLevel() {
+        return childLevel;
+    }
+
+    public void setChildLevel(int childLevel) {
+        this.childLevel = childLevel;
     }
 
     @Override

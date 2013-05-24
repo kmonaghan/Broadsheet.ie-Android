@@ -27,7 +27,7 @@ public class CommentListActivity extends SherlockListActivity {
             post = app.getPosts().get(extras.getInt("item_id"));
         }
 
-        setListAdapter(new CommentAdapter(this, R.layout.comment_list_item, post.getComments()));
+        setListAdapter(new CommentAdapter(this, R.layout.comment_list_item, post.getSortedComments()));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
