@@ -104,8 +104,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         mPullRefreshListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
             @Override
             public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-                postListAdapter.reset();
-                postListAdapter.fetchPosts();
+                fetchPosts(null);
             }
         });
 
@@ -135,7 +134,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         super.onResume();
 
         if (!postListAdapter.isLoaded()) {
-            postListAdapter.fetchPosts();
+            fetchPosts(null);
         }
     }
 
@@ -224,9 +223,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.i(TAG, "Query to search for: " + query);
-        postListAdapter.reset();
-        postListAdapter.setSearchTerm(query);
-        postListAdapter.fetchPosts();
+        fetchPosts(query);
 
         searchView.clearFocus();
 
@@ -241,7 +238,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     @Override
     public boolean onClose() {
-        // TODO Auto-generated method stub
+        // fetchPosts(null);
+
         return false;
     }
 
@@ -255,4 +253,9 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     }
 
+    private void fetchPosts(String query) {
+        postListAdapter.reset();
+        postListAdapter.setSearchTerm(query);
+        postListAdapter.fetchPosts();
+    }
 }

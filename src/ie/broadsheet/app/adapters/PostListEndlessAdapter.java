@@ -26,7 +26,7 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
     private boolean loaded = false;
 
-    private int currentPage = 0;
+    private int currentPage = 1;
 
     private String searchTerm;
 
@@ -78,12 +78,10 @@ public class PostListEndlessAdapter extends EndlessAdapter {
     }
 
     public void reset() {
-
         loaded = false;
         hasMore = true;
         searchTerm = null;
-        currentPage = 0;
-
+        currentPage = 1;
     }
 
     public void fetchPosts() {
@@ -121,7 +119,7 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
             BroadsheetApplication app = (BroadsheetApplication) PostListEndlessAdapter.this.getContext()
                     .getApplicationContext();
-            if (PostListEndlessAdapter.this.currentPage == 0) {
+            if (PostListEndlessAdapter.this.currentPage == 1) {
                 app.setPosts(null);
                 ((PostListAdapter) getWrappedAdapter()).clear();
             }
