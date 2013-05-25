@@ -5,6 +5,7 @@ import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter.PostListLoadedListener;
 import ie.broadsheet.app.dialog.AboutDialog;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +58,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     private SearchView searchView;
 
+    private ProgressDialog searchProgress;
+
     /**
      * A callback interface that all activities containing this fragment must implement. This mechanism allows
      * activities to be notified of item selections.
@@ -83,6 +86,9 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         postListAdapter.setPostListLoadedListener(this);
         setListAdapter(postListAdapter);
 
+        searchProgress = new ProgressDialog(getActivity());
+        searchProgress.setIndeterminate(true);
+        searchProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
 
     @Override
@@ -136,6 +142,12 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         if (!postListAdapter.isLoaded()) {
             fetchPosts(null);
         }
+    }
+
+    @Override
+    public void onPause() {
+        searchProgress.dismiss();
+        super.onPause();
     }
 
     @Override
@@ -225,6 +237,9 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         Log.i(TAG, "Query to search for: " + query);
         fetchPosts(query);
 
+        searchProgress.setMessage(getResources().getString(R.string.searching));
+        searchProgress.show();
+
         searchView.clearFocus();
 
         return false;
@@ -245,6 +260,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     @Override
     public void onPostListLoaded() {
+        searchProgress.dismiss();
         mPullRefreshListView.onRefreshComplete();
     }
 
