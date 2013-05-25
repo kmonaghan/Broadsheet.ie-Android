@@ -24,7 +24,12 @@
         android:icon="@drawable/ic_search"
         android:showAsAction="always"
         android:title="@string/action_label_search"/>
-
+    <!-- icon -->
+    <item
+        android:id="@+id/menu_submit_tip"
+        android:icon="@drawable/ic_action_photo"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_label_refresh"/>
     <!-- icon -->
     <item
         android:id="@+id/menu_view_about"

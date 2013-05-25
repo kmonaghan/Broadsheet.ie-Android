@@ -4,6 +4,7 @@ import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter.PostListLoadedListener;
 import ie.broadsheet.app.dialog.AboutDialog;
+import ie.broadsheet.app.dialog.TipDialog;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -184,10 +185,17 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.menu_view_about) {
+        switch (item.getItemId()) {
+        case R.id.menu_view_about:
             AboutDialog dialog = new AboutDialog();
             dialog.show(getActivity().getSupportFragmentManager(), "AboutDialog");
             return true;
+            // break;
+        case R.id.menu_submit_tip:
+            TipDialog tipDialog = new TipDialog();
+            tipDialog.show(getActivity().getSupportFragmentManager(), "TipDialog");
+            return true;
+            // break;
         }
 
         return super.onOptionsItemSelected(item);

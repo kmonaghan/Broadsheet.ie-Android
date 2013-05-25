@@ -22,4 +22,7 @@
 	<string name="commenter_email">Your email address</string>
 	<string name="about_title">About</string>
 	<string name="searching">Searching</string>
+	<string name="add_image_buton">Add Image</string>
+	<string name="submit_body_hint">What do you want to let us know about?</string>
+	<string name="submit_tip">Submit Tip</string>
 </resources>
