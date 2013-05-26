@@ -37,15 +37,19 @@
 
     <ImageView
         android:id="@+id/featuredImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/large_post_image_width"
+        android:layout_height="@dimen/large_post_image_height"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/standard_margin"
         android:background="@drawable/image_border"
         android:contentDescription="@string/large_post_image"
+        android:cropToPadding="true"
+        android:maxHeight="@dimen/large_post_image_height"
+        android:maxWidth="@dimen/large_post_image_width"
         android:minHeight="@dimen/large_post_image_height"
         android:minWidth="@dimen/large_post_image_width"
-        android:src="@drawable/default_post_image"
-        android:scaleType="centerCrop" />
+        android:padding="1dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_post_image" />
 
 </LinearLayout>

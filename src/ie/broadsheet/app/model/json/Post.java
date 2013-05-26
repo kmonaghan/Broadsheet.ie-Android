@@ -373,7 +373,7 @@ public class Post {
             AttachmentItem image = (AttachmentItem) ((Attachments) attachments.get(0)).getImages();
 
             if (image != null) {
-                Image thumbnail = image.getMedium();
+                Image thumbnail = image.getFull();
 
                 if (thumbnail != null) {
                     imageUrl = thumbnail.getUrl();
