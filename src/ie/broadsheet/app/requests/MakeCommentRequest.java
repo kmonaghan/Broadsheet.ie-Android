@@ -4,15 +4,19 @@ import ie.broadsheet.app.model.json.Comment;
 
 import java.io.IOException;
 
+import android.util.Log;
+
 import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.json.JsonHttpContent;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.client.util.GenericData;
 import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 
 public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
+    private static final String TAG = "MakeCommentRequest";
+
     private String baseUrl;
 
     private int postId;
@@ -58,7 +62,7 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
     public MakeCommentRequest() {
         super(Comment.class);
 
-        this.baseUrl = String.format("http://broadsheet.ie/?json=respond.submit_comment");
+        this.baseUrl = String.format("http://www.broadsheet.ie/?json=respond.submit_comment");
 
     }
 
@@ -70,7 +74,8 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         data.put("name", commentName);
         data.put("content", commentBody);
 
-        JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), data);
+        // JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), data);
+        UrlEncodedContent content = new UrlEncodedContent(data);
 
         HttpRequest request = null;
         try {
@@ -81,10 +86,14 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
             e.printStackTrace();
         }
         request.setParser(new JacksonFactory().createJsonObjectParser());
-        HttpHeaders headers = request.getHeaders();
-        headers.setContentType("application/json; charset=UTF-8");
+        // HttpHeaders headers = request.getHeaders();
+        // headers.setContentType("application/json; charset=UTF-8");
 
-        return request.execute().parseAs(getResultType());
+        HttpResponse response = request.execute();
+
+        Log.d(TAG, response.parseAsString());
+
+        return response.parseAs(getResultType());
     }
 
 }

@@ -1,15 +1,12 @@
 package ie.broadsheet.app.fragments;
 
-import ie.broadsheet.app.BaseFragmentActivity;
 import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.CommentListActivity;
 import ie.broadsheet.app.PostDetailActivity;
 import ie.broadsheet.app.PostListActivity;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.dialog.MakeCommentDialog;
-import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
-import ie.broadsheet.app.requests.MakeCommentRequest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -32,15 +29,12 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
-import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
 
 /**
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
-public class PostDetailFragment extends SherlockFragment implements MakeCommentDialog.MakeCommentDialogListener {
+public class PostDetailFragment extends SherlockFragment {
     private static final String TAG = "PostDetailFragment";
 
     /**
@@ -148,7 +142,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         } else if (item.getItemId() == R.id.menu_make_comment) {
 
             MakeCommentDialog dialog = new MakeCommentDialog();
-            dialog.setmListener(this);
+            dialog.setPostId(post.getId());
             dialog.show(getActivity().getSupportFragmentManager(), "MakeCommentDialog");
 
             /*
@@ -235,37 +229,6 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             view.loadUrl(javascript);
 
             super.onPageFinished(view, url);
-        }
-    }
-
-    @Override
-    public void onDialogPositiveClick(String email, String commenterName, String commentBody) {
-        MakeCommentRequest makeCommentRequest = new MakeCommentRequest();
-        makeCommentRequest.setPostId(post.getId());
-        makeCommentRequest.setEmail(email);
-        makeCommentRequest.setEmail(commenterName);
-        makeCommentRequest.setEmail(commentBody);
-
-        BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
-
-        activity.getSpiceManager().execute(makeCommentRequest, "", DurationInMillis.NEVER, new MakeCommentListener());
-    }
-
-    // ============================================================================================
-    // INNER CLASSES
-    // ============================================================================================
-
-    public final class MakeCommentListener implements RequestListener<Comment> {
-
-        @Override
-        public void onRequestFailure(SpiceException spiceException) {
-            Log.d(TAG, "Failed to get results: " + spiceException.toString());
-        }
-
-        @Override
-        public void onRequestSuccess(final Comment result) {
-            Log.d(TAG, "we got result: " + result.toString());
-
         }
     }
 }
