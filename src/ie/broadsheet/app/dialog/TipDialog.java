@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
@@ -49,7 +50,18 @@ public class TipDialog extends DialogFragment implements OnClickListener {
                     }
                 });
 
-        return builder.create();
+        final Dialog dialog = builder.create();
+
+        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
+        return dialog;
     }
 
     @Override

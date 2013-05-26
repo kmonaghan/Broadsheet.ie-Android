@@ -11,8 +11,6 @@
         android:ems="10"
         android:hint="@string/commenter_name_hint"
         android:inputType="textPersonName" >
-
-        <requestFocus />
     </EditText>
 
     <EditText
