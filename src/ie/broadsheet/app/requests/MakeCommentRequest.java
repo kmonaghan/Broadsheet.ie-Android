@@ -4,8 +4,6 @@ import ie.broadsheet.app.model.json.Comment;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
@@ -24,6 +22,8 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
     private String email;
 
     private String commentName;
+
+    private String commentUrl;
 
     private String commentBody;
 
@@ -51,6 +51,14 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         this.commentName = commentName;
     }
 
+    public String getCommentUrl() {
+        return commentUrl;
+    }
+
+    public void setCommentUrl(String commentUrl) {
+        this.commentUrl = commentUrl;
+    }
+
     public String getCommentBody() {
         return commentBody;
     }
@@ -72,6 +80,7 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         data.put("post_id", postId);
         data.put("email", email);
         data.put("name", commentName);
+        data.put("url", commentUrl);
         data.put("content", commentBody);
 
         // JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), data);
@@ -91,7 +100,7 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
 
         HttpResponse response = request.execute();
 
-        Log.d(TAG, response.parseAsString());
+        // Log.d(TAG, response.parseAsString());
 
         return response.parseAs(getResultType());
     }

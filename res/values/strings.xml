@@ -25,4 +25,6 @@
 	<string name="add_image_buton">Add Image</string>
 	<string name="submit_body_hint">What do you want to let us know about?</string>
 	<string name="submit_tip">Submit Tip</string>
+	<string name="upload_image_hint">Upload an image</string>
+	<string name="commenter_url_hint">Your website</string>
 </resources>

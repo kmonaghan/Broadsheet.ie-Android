@@ -36,6 +36,8 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
     private EditText commenterName;
 
+    private EditText commenterUrl;
+
     private EditText commentBody;
 
     public int getPostId() {
@@ -56,12 +58,14 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
         commenterName = (EditText) view.findViewById(R.id.commenterName);
         email = (EditText) view.findViewById(R.id.commenterEmail);
+        commenterUrl = (EditText) view.findViewById(R.id.commenterUrl);
         commentBody = (EditText) view.findViewById(R.id.commentBody);
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         email.setText(sharedPref.getString("email", ""));
         commenterName.setText(sharedPref.getString("commenterName", ""));
+        commenterUrl.setText(sharedPref.getString("commenterUrl", ""));
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -117,11 +121,13 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("email", email.getText().toString());
         editor.putString("commenterName", commenterName.getText().toString());
+        editor.putString("commenterUrl", commenterUrl.getText().toString());
         editor.commit();
 
         MakeCommentRequest makeCommentRequest = new MakeCommentRequest();
         makeCommentRequest.setPostId(postId);
         makeCommentRequest.setEmail(email.getText().toString());
+        makeCommentRequest.setCommentUrl(commenterUrl.getText().toString());
         makeCommentRequest.setCommentName(commenterName.getText().toString());
         makeCommentRequest.setCommentBody(commentBody.getText().toString());
 
