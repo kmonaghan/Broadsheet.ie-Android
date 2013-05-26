@@ -116,6 +116,9 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
     @Override
     public void onClick(View v) {
+        if (!validate()) {
+            return;
+        }
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -133,6 +136,33 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
         spiceManager.execute(makeCommentRequest, "MakeCommentRequest", DurationInMillis.NEVER,
                 new MakeCommentListener());
+    }
+
+    private boolean validate() {
+        boolean okay = true;
+
+        if ((commenterName.getText().toString() == null) || (commenterName.getText().toString().length() < 1)) {
+            okay = false;
+            commenterName.setError(getResources().getString(R.string.error_no_name));
+        } else {
+            commenterName.setError(null);
+        }
+
+        if ((email.getText().toString() == null) || (email.getText().toString().length() < 1)) {
+            okay = false;
+            email.setError(getResources().getString(R.string.error_no_email));
+        } else {
+            email.setError(null);
+        }
+
+        if ((commentBody.getText().toString() == null) || (commentBody.getText().toString().length() < 1)) {
+            okay = false;
+            commentBody.setError(getResources().getString(R.string.error_no_message));
+        } else {
+            commentBody.setError(null);
+        }
+
+        return okay;
     }
 
     // ============================================================================================

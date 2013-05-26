@@ -27,4 +27,7 @@
 	<string name="submit_tip">Submit Tip</string>
 	<string name="upload_image_hint">Upload an image</string>
 	<string name="commenter_url_hint">Your website</string>
+	<string name="error_no_name">Please enter a name</string>
+	<string name="error_no_email">Please enter an email address</string>
+	<string name="error_no_message">Please enter a message</string>
 </resources>

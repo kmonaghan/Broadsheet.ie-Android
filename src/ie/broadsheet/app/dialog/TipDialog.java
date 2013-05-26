@@ -130,6 +130,9 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
         } else {
             Log.d(TAG, "clicked submit button");
 
+            if (!validate()) {
+                return;
+            }
             SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("email", email.getText().toString());
@@ -145,6 +148,33 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
             activity.getSpiceManager().execute(request, "", DurationInMillis.NEVER, new SubmitTipRequestListener());
         }
+    }
+
+    private boolean validate() {
+        boolean okay = true;
+
+        if ((name.getText().toString() == null) || (name.getText().toString().length() < 1)) {
+            okay = false;
+            name.setError(getResources().getString(R.string.error_no_name));
+        } else {
+            name.setError(null);
+        }
+
+        if ((email.getText().toString() == null) || (email.getText().toString().length() < 1)) {
+            okay = false;
+            email.setError(getResources().getString(R.string.error_no_email));
+        } else {
+            email.setError(null);
+        }
+
+        if ((message.getText().toString() == null) || (message.getText().toString().length() < 1)) {
+            okay = false;
+            message.setError(getResources().getString(R.string.error_no_message));
+        } else {
+            message.setError(null);
+        }
+
+        return okay;
     }
 
     @Override
