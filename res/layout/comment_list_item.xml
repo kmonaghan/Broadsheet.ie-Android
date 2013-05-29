@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/commentAvatar"
+            android:layout_toLeftOf="@+id/commentReply"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -37,6 +38,15 @@
             android:layout_below="@+id/commentUser"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/commentReply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="Reply" />
+
     </RelativeLayout>
 
     <TextView

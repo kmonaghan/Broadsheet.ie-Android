@@ -487,4 +487,10 @@ public class Post {
         return flattened;
 
     }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+
+        sortComments();
+    }
 }

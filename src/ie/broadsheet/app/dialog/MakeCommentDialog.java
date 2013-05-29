@@ -20,17 +20,24 @@ import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 public class MakeCommentDialog extends SherlockDialogFragment implements OnClickListener {
+
+    public interface CommentMadeListener {
+        public void onCommentMade(Comment comment);
+    }
+
+    CommentMadeListener mListener;
 
     private static final String TAG = "MakeCommentDialog";
 
     private SpiceManager spiceManager = new SpiceManager(BroadsheetServices.class);
 
     private int postId;
+
+    private int commentId = 0;
 
     private EditText email;
 
@@ -40,12 +47,26 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
     private EditText commentBody;
 
+    private Dialog dialog;
+
     public int getPostId() {
         return postId;
     }
 
     public void setPostId(int postId) {
         this.postId = postId;
+    }
+
+    public int getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
+    }
+
+    public void setCommentMadeListener(CommentMadeListener mListener) {
+        this.mListener = mListener;
     }
 
     @Override
@@ -82,7 +103,7 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
                     }
                 });
 
-        final Dialog dialog = builder.create();
+        dialog = builder.create();
 
         commenterName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -133,9 +154,11 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
         makeCommentRequest.setCommentUrl(commenterUrl.getText().toString());
         makeCommentRequest.setCommentName(commenterName.getText().toString());
         makeCommentRequest.setCommentBody(commentBody.getText().toString());
+        makeCommentRequest.setCommentId(commentId);
 
-        spiceManager.execute(makeCommentRequest, "MakeCommentRequest", DurationInMillis.NEVER,
-                new MakeCommentListener());
+        v.setEnabled(false);
+
+        spiceManager.execute(makeCommentRequest, new MakeCommentListener());
     }
 
     private boolean validate() {
@@ -174,13 +197,19 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get results: " + spiceException.toString());
+
+            ((AlertDialog) MakeCommentDialog.this.dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
         }
 
         @Override
         public void onRequestSuccess(final Comment result) {
             Log.d(TAG, "we got result: " + result.toString());
 
+            ((AlertDialog) MakeCommentDialog.this.dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
             MakeCommentDialog.this.dismiss();
+
+            MakeCommentDialog.this.mListener.onCommentMade(result);
         }
     }
 }

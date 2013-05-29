@@ -1,18 +1,24 @@
 package ie.broadsheet.app;
 
 import ie.broadsheet.app.adapters.CommentAdapter;
+import ie.broadsheet.app.dialog.MakeCommentDialog;
+import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
 import android.os.Bundle;
+import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
-public class CommentListActivity extends SherlockListActivity {
+public class CommentListActivity extends SherlockFragmentActivity implements MakeCommentDialog.CommentMadeListener,
+        CommentAdapter.ReplyCommentListener {
     private Post post;
+
+    private CommentAdapter comments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +33,12 @@ public class CommentListActivity extends SherlockListActivity {
             post = app.getPosts().get(extras.getInt("item_id"));
         }
 
-        setListAdapter(new CommentAdapter(this, R.layout.comment_list_item, post.getSortedComments()));
+        ListView list = (ListView) findViewById(android.R.id.list);
+
+        comments = new CommentAdapter(this, R.layout.comment_list_item, post.getSortedComments());
+        comments.setReplyCommentListener(this);
+
+        list.setAdapter(comments);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -35,21 +46,21 @@ public class CommentListActivity extends SherlockListActivity {
         boolean pauseOnFling = true;
         PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll,
                 pauseOnFling);
-        getListView().setOnScrollListener(listener);
+        list.setOnScrollListener(listener);
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        EasyTracker.getInstance().activityStart(this); // Add this method.
+        EasyTracker.getInstance().activityStart(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        EasyTracker.getInstance().activityStop(this); // Add this method.
+        EasyTracker.getInstance().activityStop(this);
     }
 
     @Override
@@ -64,7 +75,27 @@ public class CommentListActivity extends SherlockListActivity {
         if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.menu_make_comment) {
+            onReply(0);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCommentMade(Comment comment) {
+        post.addComment(comment);
+
+        comments.clear();
+        comments.addAll(post.getSortedComments());
+        comments.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onReply(int commentId) {
+        MakeCommentDialog dialog = new MakeCommentDialog();
+        dialog.setPostId(post.getId());
+        dialog.setCommentMadeListener(this);
+        dialog.setCommentId(commentId);
+        dialog.show(this.getSupportFragmentManager(), "MakeCommentDialog");
     }
 }

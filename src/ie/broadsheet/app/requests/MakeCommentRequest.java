@@ -6,18 +6,19 @@ import java.io.IOException;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.client.util.GenericData;
 import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 
 public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
-    private static final String TAG = "MakeCommentRequest";
+    // private static final String TAG = "MakeCommentRequest";
 
     private String baseUrl;
 
     private int postId;
+
+    private int commentId = 0;
 
     private String email;
 
@@ -67,6 +68,14 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         this.commentBody = commentBody;
     }
 
+    public int getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
+    }
+
     public MakeCommentRequest() {
         super(Comment.class);
 
@@ -83,7 +92,10 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         data.put("url", commentUrl);
         data.put("content", commentBody);
 
-        // JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), data);
+        if (commentId > 0) {
+            data.put("comment_parent", commentId);
+        }
+
         UrlEncodedContent content = new UrlEncodedContent(data);
 
         HttpRequest request = null;
@@ -95,14 +107,8 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
             e.printStackTrace();
         }
         request.setParser(new JacksonFactory().createJsonObjectParser());
-        // HttpHeaders headers = request.getHeaders();
-        // headers.setContentType("application/json; charset=UTF-8");
 
-        HttpResponse response = request.execute();
-
-        // Log.d(TAG, response.parseAsString());
-
-        return response.parseAs(getResultType());
+        return request.execute().parseAs(getResultType());
     }
 
 }

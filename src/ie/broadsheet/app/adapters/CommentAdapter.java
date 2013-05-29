@@ -12,78 +12,115 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class CommentAdapter extends ArrayAdapter<Comment> {
-    public static class ViewHolder {
-        public ImageView commentAvatar;
+public class CommentAdapter extends ArrayAdapter<Comment> implements
+		View.OnClickListener {
+	public interface ReplyCommentListener {
+		public void onReply(int commentId);
+	}
 
-        public TextView commentUser;
+	ReplyCommentListener mListener;
 
-        public TextView commentDate;
+	public static class ViewHolder {
+		public ImageView commentAvatar;
 
-        public TextView commentBody;
-    }
+		public TextView commentUser;
 
-    public CommentAdapter(Context context, int textViewResourceId, List<Comment> comments) {
-        super(context, textViewResourceId, comments);
+		public TextView commentDate;
 
-    }
+		public TextView commentBody;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
+		public Button replyButton;
+	}
 
-        Activity activity = (Activity) getContext();
+	public void setReplyCommentListener(ReplyCommentListener mListener) {
+		this.mListener = mListener;
+	}
 
-        ViewHolder holder;
-        if (v == null) {
+	public CommentAdapter(Context context, int textViewResourceId,
+			List<Comment> comments) {
+		super(context, textViewResourceId, comments);
 
-            LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(R.layout.comment_list_item, parent, false);
-            holder = new ViewHolder();
-            holder.commentAvatar = (ImageView) v.findViewById(R.id.commentAvatar);
-            holder.commentUser = (TextView) v.findViewById(R.id.commentUser);
-            holder.commentDate = (TextView) v.findViewById(R.id.commentDate);
-            holder.commentBody = (TextView) v.findViewById(R.id.commentBody);
-            v.setTag(holder);
-        } else {
-            holder = (ViewHolder) v.getTag();
+	}
 
-            holder.commentAvatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.default_user));
-        }
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View v = convertView;
 
-        int standardMargin = activity.getResources().getDimensionPixelSize(R.dimen.standard_margin);
+		Activity activity = (Activity) getContext();
 
-        final Comment comment = getItem(position);
+		ViewHolder holder;
+		if (v == null) {
 
-        int newMargin = standardMargin + (standardMargin * 2 * comment.getChildLevel());
-        v.setPadding(newMargin, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
+			LayoutInflater vi = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			v = vi.inflate(R.layout.comment_list_item, parent, false);
+			holder = new ViewHolder();
+			holder.commentAvatar = (ImageView) v
+					.findViewById(R.id.commentAvatar);
+			holder.commentUser = (TextView) v.findViewById(R.id.commentUser);
+			holder.commentDate = (TextView) v.findViewById(R.id.commentDate);
+			holder.commentBody = (TextView) v.findViewById(R.id.commentBody);
+			holder.replyButton = (Button) v.findViewById(R.id.commentReply);
+			v.setTag(holder);
+		} else {
+			holder = (ViewHolder) v.getTag();
 
-        if (comment != null) {
-            String avatar = comment.getAvatar();
+			holder.commentAvatar.setImageDrawable(activity.getResources()
+					.getDrawable(R.drawable.default_user));
+		}
 
-            if ((avatar != null) && (avatar.length() > 0)) {
-                DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory().cacheOnDisc()
-                /*
-                 * .displayer( new RoundedBitmapDisplayer(activity.getResources().getDimensionPixelSize(
-                 * R.dimen.standard_corner_radius)))
-                 */
-                .build();
+		int standardMargin = activity.getResources().getDimensionPixelSize(
+				R.dimen.standard_margin);
 
-                ImageLoader.getInstance().displayImage(avatar, holder.commentAvatar, options);
-            }
+		final Comment comment = getItem(position);
 
-            holder.commentUser.setText(comment.getName());
-            holder.commentDate.setText(comment.getRelativeTime());
-            holder.commentBody.setText(Html.fromHtml(comment.getContent()));
+		int newMargin = standardMargin
+				+ (standardMargin * 2 * comment.getChildLevel());
+		v.setPadding(newMargin, v.getPaddingTop(), v.getPaddingRight(),
+				v.getPaddingBottom());
 
-        }
+		if (comment != null) {
+			String avatar = comment.getAvatar();
 
-        return v;
-    }
+			if ((avatar != null) && (avatar.length() > 0)) {
+				DisplayImageOptions options = new DisplayImageOptions.Builder()
+						.cacheInMemory().cacheOnDisc()
+						/*
+						 * .displayer( new
+						 * RoundedBitmapDisplayer(activity.getResources
+						 * ().getDimensionPixelSize(
+						 * R.dimen.standard_corner_radius)))
+						 */
+						.build();
+
+				ImageLoader.getInstance().displayImage(avatar,
+						holder.commentAvatar, options);
+			}
+
+			holder.commentUser.setText(comment.getName());
+			holder.commentDate.setText(comment.getRelativeTime());
+			holder.commentBody.setText(Html.fromHtml(comment.getContent()));
+
+			holder.replyButton.setTag(position);
+			holder.replyButton.setOnClickListener(this);
+		}
+
+		return v;
+	}
+
+	@Override
+	public void onClick(View v) {
+		int position = (Integer) v.getTag();
+
+		final Comment comment = getItem(position);
+
+		mListener.onReply(comment.getId());
+	}
 }

@@ -6,6 +6,7 @@ import ie.broadsheet.app.PostDetailActivity;
 import ie.broadsheet.app.PostListActivity;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.dialog.MakeCommentDialog;
+import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -34,7 +35,7 @@ import com.google.analytics.tracking.android.Tracker;
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
-public class PostDetailFragment extends SherlockFragment {
+public class PostDetailFragment extends SherlockFragment implements MakeCommentDialog.CommentMadeListener {
     private static final String TAG = "PostDetailFragment";
 
     /**
@@ -143,15 +144,8 @@ public class PostDetailFragment extends SherlockFragment {
 
             MakeCommentDialog dialog = new MakeCommentDialog();
             dialog.setPostId(post.getId());
+            dialog.setCommentMadeListener(this);
             dialog.show(getActivity().getSupportFragmentManager(), "MakeCommentDialog");
-
-            /*
-             * FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction(); // For a
-             * little polish, specify a transition animation
-             * transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN); // To make it fullscreen, use the
-             * 'content' root view as the container // for the fragment, which is always the root view for the activity
-             * transaction.add(android.R.id.content, dialog).addToBackStack(null).commit();
-             */
         }
         return super.onOptionsItemSelected(item);
     }
@@ -167,7 +161,13 @@ public class PostDetailFragment extends SherlockFragment {
         return sharingIntent;
     }
 
-    // Via http://stackoverflow.com/questions/14088623/android-webview-to-play-youtube-videos
+    @Override
+    public void onCommentMade(Comment comment) {
+        post.addComment(comment);
+    }
+
+    // Via
+    // http://stackoverflow.com/questions/14088623/android-webview-to-play-youtube-videos
     public class MyWebViewClient extends WebViewClient {
 
         public Activity mActivity;
