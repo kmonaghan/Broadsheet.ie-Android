@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
@@ -146,7 +145,7 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
             BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
-            activity.getSpiceManager().execute(request, "", DurationInMillis.NEVER, new SubmitTipRequestListener());
+            activity.getSpiceManager().execute(request, new SubmitTipRequestListener());
         }
     }
 

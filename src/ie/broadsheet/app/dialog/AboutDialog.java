@@ -11,15 +11,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.view.LayoutInflater;
 import android.widget.Toast;
 
 public class AboutDialog extends DialogFragment implements OnClickListener {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
-        LayoutInflater inflater = getActivity().getLayoutInflater();
 
         builder.setTitle(R.string.about_title).setItems(R.array.about_array, this)
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
