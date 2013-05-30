@@ -36,6 +36,8 @@ public class PostDetailActivity extends BaseFragmentActivity {
             Bundle arguments = new Bundle();
             arguments
                     .putInt(PostDetailFragment.ARG_ITEM_ID, getIntent().getIntExtra(PostDetailFragment.ARG_ITEM_ID, 0));
+            arguments.putString(PostDetailFragment.ARG_ITEM_URL,
+                    getIntent().getStringExtra(PostDetailFragment.ARG_ITEM_URL));
             PostDetailFragment fragment = new PostDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.post_detail_container, fragment).commit();

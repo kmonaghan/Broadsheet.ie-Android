@@ -1,5 +1,6 @@
 package ie.broadsheet.app.fragments;
 
+import ie.broadsheet.app.BaseFragmentActivity;
 import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.CommentListActivity;
 import ie.broadsheet.app.PostDetailActivity;
@@ -8,8 +9,11 @@ import ie.broadsheet.app.R;
 import ie.broadsheet.app.dialog.MakeCommentDialog;
 import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
+import ie.broadsheet.app.model.json.SinglePost;
+import ie.broadsheet.app.requests.PostRequest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,6 +34,9 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 /**
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
@@ -43,11 +50,17 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
      */
     public static final String ARG_ITEM_ID = "item_id";
 
+    public static final String ARG_ITEM_URL = "item_url";
+
     private Post post;
 
-    int postIndex;
+    private WebView webview;
+
+    private int postIndex;
 
     private ShareActionProvider actionProvider;
+
+    private ProgressDialog mProgressDialog;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
@@ -61,7 +74,21 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        String url = getArguments().getString(ARG_ITEM_URL);
+
+        if (url != null) {
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage(getResources().getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.show();
+
+            BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
+
+            PostRequest postRequest = new PostRequest(url);
+
+            activity.getSpiceManager().execute(postRequest, url, DurationInMillis.ONE_MINUTE, new PostListener());
+        } else if (getArguments().containsKey(ARG_ITEM_ID)) {
             BroadsheetApplication app = (BroadsheetApplication) getActivity().getApplication();
             postIndex = getArguments().getInt(ARG_ITEM_ID);
             post = app.getPosts().get(postIndex);
@@ -76,14 +103,26 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        inflater.inflate(R.menu.posts, menu);
+        if (post != null) {
 
-        MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+            inflater.inflate(R.menu.posts, menu);
 
-        actionProvider = (ShareActionProvider) actionItem.getActionProvider();
-        actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+            menu.findItem(R.id.menu_make_comment).setVisible(post.getComment_status().equals("open"));
 
-        actionProvider.setShareIntent(createShareIntent());
+            menu.findItem(R.id.menu_view_comments).setVisible((post.getComment_count() > 0));
+
+            MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
+
+            actionProvider = (ShareActionProvider) actionItem.getActionProvider();
+            actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+
+            actionProvider.setShareIntent(createShareIntent());
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
     }
 
     @Override
@@ -105,29 +144,14 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_post_detail, container, false);
 
+        webview = (WebView) rootView.findViewById(R.id.webview);
+
         if (post != null) {
-
-            WebView webview = (WebView) rootView.findViewById(R.id.webview);
-
-            String postHTML = "<html><head><script type=\"text/javascript\" src=\"kmwordpress.js\"></script>";
-            postHTML += "<style>#singlentry {font-size: 16px;}</style><link href='default.css' rel='stylesheet' type='text/css' />";
-            postHTML += "</head><body id=\"contentbody\"><div id='maincontent' class='content'><div class='post'><div id='title'>"
-                    + post.getTitle()
-                    + "</div><div><span class='date-color'>"
-                    + post.getDate()
-                    + "</span>&nbsp;<a class='author' href=\"kmwordpress://author:%@\">"
-                    + post.getAuthor().getNickname() + "</a></div>";
-            postHTML += "<div id='singlentry'>" + post.getContent() + "</div></div>";
-            postHTML += "</div></body></html>";
-
-            webview.getSettings().setJavaScriptEnabled(true);
-            webview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
-            webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
+            layoutView();
         }
 
         return rootView;
@@ -166,6 +190,25 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         post.addComment(comment);
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
+    private void layoutView() {
+        String postHTML = "<html><head>";
+        postHTML += "<style>#singlentry {font-size: 16px;}</style><link href='default.css' rel='stylesheet' type='text/css' />";
+        postHTML += "</head><body id=\"contentbody\"><div id='maincontent' class='content'><div class='post'><div id='title'>"
+                + post.getTitle()
+                + "</div><div><span class='date-color'>"
+                + post.getDate()
+                + "</span>&nbsp;<a class='author' href=\"kmwordpress://author:%@\">"
+                + post.getAuthor().getName()
+                + "</a></div>";
+        postHTML += "<div id='singlentry'>" + post.getContent() + "</div></div>";
+        postHTML += "</div></body></html>";
+
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
+        webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
+    }
+
     // Via
     // http://stackoverflow.com/questions/14088623/android-webview-to-play-youtube-videos
     public class MyWebViewClient extends WebViewClient {
@@ -183,6 +226,9 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             if (uri.getHost().contains("youtube.com")) {
                 viewYoutube(mActivity, url);
                 return true;
+            } else if (url.contains("broadsheet.ie/20")) {
+                viewBroadsheetPost(mActivity, url);
+                return true;
             }
 
             return false;
@@ -190,6 +236,12 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         public void viewYoutube(Context context, String url) {
             viewWithPackageName(context, url, "com.google.android.youtube");
+        }
+
+        public void viewBroadsheetPost(Context context, String url) {
+            Intent postIntent = new Intent(getActivity(), PostDetailActivity.class);
+            postIntent.putExtra(PostDetailFragment.ARG_ITEM_URL, url);
+            startActivity(postIntent);
         }
 
         public void viewWithPackageName(Context context, String url, String packageName) {
@@ -229,6 +281,28 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             view.loadUrl(javascript);
 
             super.onPageFinished(view, url);
+        }
+    }
+
+    public final class PostListener implements RequestListener<SinglePost> {
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Log.d(TAG, "Failed to get post");
+
+            PostDetailFragment.this.mProgressDialog.dismiss();
+        }
+
+        @Override
+        public void onRequestSuccess(final SinglePost result) {
+            Log.d(TAG, "we got a post: " + result.toString());
+            PostDetailFragment.this.post = result.getPost();
+
+            PostDetailFragment.this.mProgressDialog.dismiss();
+
+            PostDetailFragment.this.getActivity().invalidateOptionsMenu();
+
+            PostDetailFragment.this.layoutView();
         }
     }
 }
