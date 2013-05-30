@@ -30,4 +30,6 @@
 	<string name="error_no_name">Please enter a name</string>
 	<string name="error_no_email">Please enter an email address</string>
 	<string name="error_no_message">Please enter a message</string>
+	<string name="posting_comment">Posting comment</string>
+	<string name="posting_tip">Posting tip</string>
 </resources>

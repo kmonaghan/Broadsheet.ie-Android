@@ -7,6 +7,7 @@ import ie.broadsheet.app.requests.SubmitTipRequest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,8 +42,15 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
     private EditText message;
 
+    private ProgressDialog mProgressDialog;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mProgressDialog = new ProgressDialog(getActivity());
+        mProgressDialog.setMessage(getResources().getString(R.string.posting_tip));
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -143,6 +152,15 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             request.setEmail(email.getText().toString());
             request.setMessage(message.getText().toString());
 
+            email.clearFocus();
+            name.clearFocus();
+            message.clearFocus();
+
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
+
+            mProgressDialog.show();
+
             BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
             activity.getSpiceManager().execute(request, new SubmitTipRequestListener());
@@ -190,11 +208,15 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get results: " + spiceException.toString());
+
+            TipDialog.this.mProgressDialog.dismiss();
         }
 
         @Override
         public void onRequestSuccess(final SubmitTipResponse result) {
             Log.d(TAG, "we got result: " + result.toString());
+
+            TipDialog.this.mProgressDialog.dismiss();
 
             TipDialog.this.dismiss();
         }
