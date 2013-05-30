@@ -47,6 +47,8 @@ public class CommentListActivity extends SherlockFragmentActivity implements Mak
         PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll,
                 pauseOnFling);
         list.setOnScrollListener(listener);
+
+        setTitle(getResources().getString(R.string.comment));
     }
 
     @Override
@@ -66,7 +68,9 @@ public class CommentListActivity extends SherlockFragmentActivity implements Mak
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getSupportMenuInflater().inflate(R.menu.comment_list, menu);
+        if (post.getComment_status().equals("open")) {
+            getSupportMenuInflater().inflate(R.menu.comment_list, menu);
+        }
         return true;
     }
 
