@@ -33,4 +33,7 @@
 	<string name="posting_comment">Posting comment</string>
 	<string name="posting_tip">Posting tip</string>
 	<string name="loading">Loading</string>
+	<string name="reply">Reply</string>
+	<string name="next">Next</string>
+	<string name="previous">Previous</string>
 </resources>

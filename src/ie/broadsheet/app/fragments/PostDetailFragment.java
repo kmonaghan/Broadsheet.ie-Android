@@ -23,9 +23,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -42,7 +44,8 @@ import com.octo.android.robospice.request.listener.RequestListener;
  * A fragment representing a single Post detail screen. This fragment is either contained in a {@link PostListActivity}
  * in two-pane mode (on tablets) or a {@link PostDetailActivity} on handsets.
  */
-public class PostDetailFragment extends SherlockFragment implements MakeCommentDialog.CommentMadeListener {
+public class PostDetailFragment extends SherlockFragment implements MakeCommentDialog.CommentMadeListener,
+        OnClickListener {
     private static final String TAG = "PostDetailFragment";
 
     /**
@@ -56,11 +59,17 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     private WebView webview;
 
-    private int postIndex;
+    private int postIndex = -1;
 
     private ShareActionProvider actionProvider;
 
     private ProgressDialog mProgressDialog;
+
+    private Button next;
+
+    private Button previous;
+
+    private BroadsheetApplication app;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
@@ -89,7 +98,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
             activity.getSpiceManager().execute(postRequest, url, DurationInMillis.ONE_MINUTE, new PostListener());
         } else if (getArguments().containsKey(ARG_ITEM_ID)) {
-            BroadsheetApplication app = (BroadsheetApplication) getActivity().getApplication();
+            app = (BroadsheetApplication) getActivity().getApplication();
             postIndex = getArguments().getInt(ARG_ITEM_ID);
             post = app.getPosts().get(postIndex);
         }
@@ -150,6 +159,17 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         webview = (WebView) rootView.findViewById(R.id.webview);
 
+        next = (Button) rootView.findViewById(R.id.next);
+        previous = (Button) rootView.findViewById(R.id.previous);
+
+        next.setOnClickListener(this);
+        previous.setOnClickListener(this);
+
+        if (postIndex == -1) {
+            next.setVisibility(View.GONE);
+            previous.setVisibility(View.GONE);
+        }
+
         if (post != null) {
             layoutView();
         }
@@ -207,6 +227,22 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         webview.getSettings().setJavaScriptEnabled(true);
         webview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
         webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
+
+        next.setEnabled((postIndex > 0));
+        previous.setEnabled(((postIndex + 1) < app.getPosts().size()));
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.next) {
+            postIndex--;
+        } else if (v.getId() == R.id.previous) {
+            postIndex++;
+        }
+
+        post = app.getPosts().get(postIndex);
+
+        layoutView();
     }
 
     // Via
