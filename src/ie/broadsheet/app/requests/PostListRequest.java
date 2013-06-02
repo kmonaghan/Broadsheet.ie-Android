@@ -40,7 +40,7 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
     public PostListRequest() {
         super(PostList.class);
 
-        this.baseUrl = String.format("http://broadsheet.ie/?json=1");
+        this.baseUrl = String.format("http://www.broadsheet.ie/?json=1");
 
     }
 
