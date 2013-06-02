@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -43,6 +44,8 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
     private EditText message;
 
     private ProgressDialog mProgressDialog;
+
+    private String picturePath;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -115,22 +118,20 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
+            picturePath = cursor.getString(columnIndex);
             cursor.close();
 
             Log.d(TAG, "Picture path is : " + picturePath);
 
             ImageView imageView = (ImageView) getDialog().findViewById(R.id.sumbitorImage);
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-
+            imageView.setScaleType(ScaleType.CENTER_INSIDE);
         }
 
     }
 
     @Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
-
         if (v.getId() == R.id.addImage) {
             Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -151,6 +152,7 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             request.setName(name.getText().toString());
             request.setEmail(email.getText().toString());
             request.setMessage(message.getText().toString());
+            request.setFilename(picturePath);
 
             email.clearFocus();
             name.clearFocus();

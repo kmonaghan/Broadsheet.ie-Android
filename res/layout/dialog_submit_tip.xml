@@ -35,13 +35,16 @@
 
         <ImageView
             android:id="@+id/sumbitorImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp	"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="40dp"
             android:contentDescription="@string/upload_image_hint"
-            android:src="@drawable/ic_launcher" />
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_launcher"
+            android:maxHeight="48dp"
+            android:maxWidth="48dp" />
 
         <Button
             android:id="@+id/addImage"
