@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/commenter_url_hint"
-        android:inputType="textEmailAddress" />
+        android:inputType="textUri" />
 
     <EditText
         android:id="@+id/commentBody"
@@ -36,6 +36,6 @@
         android:ems="10"
         android:inputType="textMultiLine"
         android:maxLines="4"
-        android:minLines="4" />
+        android:minLines="2" />
 
 </LinearLayout>
