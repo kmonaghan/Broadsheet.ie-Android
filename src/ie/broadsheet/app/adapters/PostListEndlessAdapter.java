@@ -107,6 +107,13 @@ public class PostListEndlessAdapter extends EndlessAdapter {
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get results");
+
+            BaseFragmentActivity activity = (BaseFragmentActivity) getContext();
+
+            hasMore = false;
+            onDataReady();
+
+            activity.showError(activity.getString(R.string.post_list_load_problem));
         }
 
         @Override
@@ -131,6 +138,8 @@ public class PostListEndlessAdapter extends EndlessAdapter {
             postListRequest = null;
 
             PostListEndlessAdapter.this.postListLoadedListener.onPostListLoaded();
+
+            app.getTracker().sendView("Post List Page" + Integer.toString(PostListEndlessAdapter.this.currentPage));
         }
     }
 }
