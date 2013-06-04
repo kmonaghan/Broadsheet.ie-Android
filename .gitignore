@@ -75,3 +75,5 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 /target
+
+res/values/com_crashlytics_export_strings.xml

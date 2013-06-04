@@ -43,6 +43,7 @@
             android:name="ie.broadsheet.app.CommentListActivity"
             android:label="@string/title_activity_comment_list" >
         </activity>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="1b5e41ad9a5dcccd4e157158af5242bfdc7fe671"/>
     </application>
 
 </manifest>
