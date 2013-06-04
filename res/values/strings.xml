@@ -36,4 +36,6 @@
 	<string name="reply">Reply</string>
 	<string name="next">Next</string>
 	<string name="previous">Previous</string>
+	<string name="post_load_problem">There was a problem loading the post.</string>
+	<string name="post_list_load_problem">There was a problem loading the list of posts. Please try again in a minute.</string>
 </resources>

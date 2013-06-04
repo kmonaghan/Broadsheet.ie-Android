@@ -1,5 +1,6 @@
 package ie.broadsheet.app.dialog;
 
+import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,10 +30,12 @@ public class AboutDialog extends DialogFragment implements OnClickListener {
         return builder.create();
     }
 
-    /*
-     * <item>About Us</item> <item>Rate this app</item> <item>About the developer</item> <item>3rd Party
-     * Libraries</item> <item>Contact us</item>
-     */
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        ((BroadsheetApplication) getActivity().getApplication()).getTracker().sendView("About");
+    }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {

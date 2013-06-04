@@ -8,6 +8,8 @@ import java.util.List;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.Tracker;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -28,6 +30,10 @@ public class BroadsheetApplication extends Application {
         }
     }
 
+    private Tracker mGaTracker;
+
+    private GoogleAnalytics mGaInstance;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -39,5 +45,14 @@ public class BroadsheetApplication extends Application {
         this.posts = new ArrayList<Post>();
 
         Crashlytics.start(this);
+
+        mGaInstance = GoogleAnalytics.getInstance(this);
+
+        mGaTracker = mGaInstance.getTracker("UA-5653857-3");
     }
+
+    public Tracker getTracker() {
+        return mGaTracker;
+    }
+
 }

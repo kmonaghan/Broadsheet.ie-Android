@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +35,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
-import com.google.analytics.tracking.android.GoogleAnalytics;
-import com.google.analytics.tracking.android.Tracker;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -137,20 +136,6 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     @Override
     public void onStart() {
         super.onStart();
-
-        GoogleAnalytics mGaInstance = GoogleAnalytics.getInstance(getActivity());
-
-        if (mGaInstance != null) {
-            Tracker mGaTracker = mGaInstance.getDefaultTracker();
-            if (mGaTracker != null) {
-                mGaTracker.sendView(post.getTitle());
-                Log.d(TAG, "Logged view");
-            } else {
-                Log.d(TAG, "no GA Tracker instance");
-            }
-        } else {
-            Log.d(TAG, "no GA instance");
-        }
     }
 
     @Override
@@ -230,6 +215,9 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         next.setEnabled((postIndex > 0));
         previous.setEnabled(((postIndex + 1) < app.getPosts().size()));
+
+        app.getTracker()
+                .sendView("Post " + Html.fromHtml(post.getTitle_plain()) + " " + Integer.toString(post.getId()));
     }
 
     @Override
@@ -327,6 +315,10 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             Log.d(TAG, "Failed to get post");
 
             PostDetailFragment.this.mProgressDialog.dismiss();
+
+            BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
+
+            activity.showError(getActivity().getString(R.string.post_load_problem));
         }
 
         @Override

@@ -5,12 +5,12 @@ import ie.broadsheet.app.dialog.MakeCommentDialog;
 import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.analytics.tracking.android.EasyTracker;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
@@ -55,14 +55,13 @@ public class CommentListActivity extends SherlockFragmentActivity implements Mak
     public void onStart() {
         super.onStart();
 
-        EasyTracker.getInstance().activityStart(this);
+        ((BroadsheetApplication) getApplication()).getTracker().sendView(
+                "Comment List: " + Html.fromHtml(post.getTitle_plain()) + " " + Integer.toString(post.getId()));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        EasyTracker.getInstance().activityStop(this);
     }
 
     @Override

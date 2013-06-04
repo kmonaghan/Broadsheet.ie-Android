@@ -1,6 +1,7 @@
 package ie.broadsheet.app.dialog;
 
 import ie.broadsheet.app.BaseFragmentActivity;
+import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.model.json.SubmitTipResponse;
 import ie.broadsheet.app.requests.SubmitTipRequest;
@@ -104,6 +105,8 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(this);
         }
+
+        ((BroadsheetApplication) getActivity().getApplication()).getTracker().sendView("Submit Tip");
     }
 
     @Override
