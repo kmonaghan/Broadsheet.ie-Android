@@ -1,5 +1,7 @@
 package ie.broadsheet.app.requests;
 
+import ie.broadsheet.app.BroadsheetApplication;
+import ie.broadsheet.app.R;
 import ie.broadsheet.app.model.json.Comment;
 
 import java.io.IOException;
@@ -79,7 +81,7 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
     public MakeCommentRequest() {
         super(Comment.class);
 
-        this.baseUrl = String.format("http://www.broadsheet.ie/?json=respond.submit_comment");
+        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "?json=respond.submit_comment";
 
     }
 

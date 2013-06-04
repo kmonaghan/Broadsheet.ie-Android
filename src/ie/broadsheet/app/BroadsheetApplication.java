@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -14,11 +15,17 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class BroadsheetApplication extends Application {
+    private static BroadsheetApplication mApp = null;
+
     private List<Post> posts;
 
     public List<Post> getPosts() {
         return posts;
     }
+
+    private Tracker mGaTracker;
+
+    private GoogleAnalytics mGaInstance;
 
     public void setPosts(List<Post> posts) {
         if ((this.posts == null) || (posts == null)) {
@@ -29,10 +36,6 @@ public class BroadsheetApplication extends Application {
             this.posts = posts;
         }
     }
-
-    private Tracker mGaTracker;
-
-    private GoogleAnalytics mGaInstance;
 
     @Override
     public void onCreate() {
@@ -49,10 +52,16 @@ public class BroadsheetApplication extends Application {
         mGaInstance = GoogleAnalytics.getInstance(this);
 
         mGaTracker = mGaInstance.getTracker("UA-5653857-3");
+
+        mApp = this;
     }
 
     public Tracker getTracker() {
         return mGaTracker;
+    }
+
+    public static Context context() {
+        return mApp.getApplicationContext();
     }
 
 }

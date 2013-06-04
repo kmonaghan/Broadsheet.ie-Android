@@ -1,5 +1,7 @@
 package ie.broadsheet.app.requests;
 
+import ie.broadsheet.app.BroadsheetApplication;
+import ie.broadsheet.app.R;
 import ie.broadsheet.app.client.http.MultipartFormDataContent;
 import ie.broadsheet.app.client.http.MultipartFormDataContent.Part;
 import ie.broadsheet.app.model.json.SubmitTipResponse;
@@ -13,7 +15,6 @@ import android.webkit.MimeTypeMap;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.client.util.GenericData;
@@ -114,7 +115,8 @@ public class SubmitTipRequest extends GoogleHttpClientSpiceRequest<SubmitTipResp
         HttpRequest request = null;
         try {
             request = getHttpRequestFactory().buildPostRequest(
-                    new GenericUrl("http://www.broadsheet.ie/iphone_tip.php"), content);
+                    new GenericUrl(BroadsheetApplication.context().getString(R.string.apiURL) + "iphone_tip.php"),
+                    content);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -122,10 +124,6 @@ public class SubmitTipRequest extends GoogleHttpClientSpiceRequest<SubmitTipResp
         }
         request.setParser(new JacksonFactory().createJsonObjectParser());
 
-        HttpResponse response = request.execute();
-
-        // Log.d(TAG, response.parseAsString());
-
-        return response.parseAs(getResultType());
+        return request.execute().parseAs(getResultType());
     }
 }

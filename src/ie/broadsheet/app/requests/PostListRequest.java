@@ -1,5 +1,7 @@
 package ie.broadsheet.app.requests;
 
+import ie.broadsheet.app.BroadsheetApplication;
+import ie.broadsheet.app.R;
 import ie.broadsheet.app.model.json.PostList;
 
 import java.io.UnsupportedEncodingException;
@@ -40,7 +42,7 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
     public PostListRequest() {
         super(PostList.class);
 
-        this.baseUrl = String.format("http://www.broadsheet.ie/?json=1");
+        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "?json=1";
 
     }
 
