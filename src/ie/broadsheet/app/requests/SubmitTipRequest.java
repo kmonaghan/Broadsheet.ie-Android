@@ -104,6 +104,13 @@ public class SubmitTipRequest extends GoogleHttpClientSpiceRequest<SubmitTipResp
         messagePart.setName("message");
         content.addPart(messagePart);
 
+        GenericData androiddata = new GenericData();
+        androiddata.put(message, "");
+        Part androidPart = new Part();
+        androidPart.setContent(new UrlEncodedContent("1"));
+        androidPart.setName("android");
+        content.addPart(androidPart);
+
         HttpRequest request = null;
         try {
             request = getHttpRequestFactory().buildPostRequest(
