@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -36,5 +37,7 @@ public class BroadsheetApplication extends Application {
         ImageLoader.getInstance().init(config);
 
         this.posts = new ArrayList<Post>();
+
+        Crashlytics.start(this);
     }
 }

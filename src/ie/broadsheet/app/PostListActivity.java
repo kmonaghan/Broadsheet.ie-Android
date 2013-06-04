@@ -1,6 +1,5 @@
 package ie.broadsheet.app;
 
-import com.crashlytics.android.Crashlytics;
 import ie.broadsheet.app.fragments.PostDetailFragment;
 import ie.broadsheet.app.fragments.PostListFragment;
 import android.content.Intent;
@@ -30,7 +29,7 @@ public class PostListActivity extends BaseFragmentActivity implements PostListFr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+
         setContentView(R.layout.activity_post_list);
 
         if (findViewById(R.id.post_detail_container) != null) {
