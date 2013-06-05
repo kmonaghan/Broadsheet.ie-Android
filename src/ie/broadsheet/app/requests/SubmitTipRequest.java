@@ -15,9 +15,7 @@ import android.webkit.MimeTypeMap;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.json.jackson.JacksonFactory;
-import com.google.api.client.util.GenericData;
 import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 
 public class SubmitTipRequest extends GoogleHttpClientSpiceRequest<SubmitTipResponse> {
@@ -84,38 +82,16 @@ public class SubmitTipRequest extends GoogleHttpClientSpiceRequest<SubmitTipResp
 
         }
 
-        GenericData data = new GenericData();
-        data.put(name, "");
-        Part namePart = new Part();
-        namePart.setContent(new UrlEncodedContent(data));
-        namePart.setName("name");
-        content.addPart(namePart);
+        content.addUrlEncodedContent("name", name);
+        content.addUrlEncodedContent("email", email);
+        content.addUrlEncodedContent("message", message);
+        content.addUrlEncodedContent("android", "android");
 
-        GenericData emaildata = new GenericData();
-        emaildata.put(email, "");
-        Part emailPart = new Part();
-        emailPart.setContent(new UrlEncodedContent(emaildata));
-        emailPart.setName("email");
-        content.addPart(emailPart);
-
-        GenericData messagedata = new GenericData();
-        messagedata.put(message, "");
-        Part messagePart = new Part();
-        messagePart.setContent(new UrlEncodedContent(messagedata));
-        messagePart.setName("message");
-        content.addPart(messagePart);
-
-        GenericData androiddata = new GenericData();
-        androiddata.put(message, "");
-        Part androidPart = new Part();
-        androidPart.setContent(new UrlEncodedContent("1"));
-        androidPart.setName("android");
-        content.addPart(androidPart);
-
+        Log.d(TAG, BroadsheetApplication.context().getString(R.string.apiURL) + "/iphone_tip.php");
         HttpRequest request = null;
         try {
             request = getHttpRequestFactory().buildPostRequest(
-                    new GenericUrl(BroadsheetApplication.context().getString(R.string.apiURL) + "iphone_tip.php"),
+                    new GenericUrl(BroadsheetApplication.context().getString(R.string.apiURL) + "/iphone_tip.php"),
                     content);
         } catch (IOException e) {
             e.printStackTrace();

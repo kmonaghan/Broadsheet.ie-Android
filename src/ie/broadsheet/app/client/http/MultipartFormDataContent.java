@@ -33,6 +33,8 @@ import com.google.api.client.http.HttpEncoding;
 import com.google.api.client.http.HttpEncodingStreamingContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpMediaType;
+import com.google.api.client.http.UrlEncodedContent;
+import com.google.api.client.util.GenericData;
 import com.google.api.client.util.Preconditions;
 import com.google.api.client.util.StreamingContent;
 
@@ -124,6 +126,19 @@ public class MultipartFormDataContent extends AbstractHttpContent {
      */
     public MultipartFormDataContent addPart(Part part) {
         parts.add(Preconditions.checkNotNull(part));
+        return this;
+    }
+
+    public MultipartFormDataContent addUrlEncodedContent(String name, String value) {
+        GenericData data = new GenericData();
+        data.put(value, "");
+
+        Part part = new Part();
+        part.setContent(new UrlEncodedContent(data));
+        part.setName(name);
+
+        this.addPart(part);
+
         return this;
     }
 
