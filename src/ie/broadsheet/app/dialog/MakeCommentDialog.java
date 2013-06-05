@@ -1,5 +1,6 @@
 package ie.broadsheet.app.dialog;
 
+import ie.broadsheet.app.BaseFragmentActivity;
 import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.model.json.Comment;
@@ -7,7 +8,6 @@ import ie.broadsheet.app.requests.MakeCommentRequest;
 import ie.broadsheet.app.services.BroadsheetServices;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -33,8 +33,6 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
     }
 
     private CommentMadeListener mListener;
-
-    private ProgressDialog mProgressDialog;
 
     private static final String TAG = "MakeCommentDialog";
 
@@ -76,11 +74,6 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage(getResources().getString(R.string.posting_comment));
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -178,7 +171,7 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(commentBody.getWindowToken(), 0);
 
-        mProgressDialog.show();
+        ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_comment));
 
         spiceManager.execute(makeCommentRequest, new MakeCommentListener());
     }
@@ -220,7 +213,7 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get results: " + spiceException.toString());
 
-            MakeCommentDialog.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             ((AlertDialog) MakeCommentDialog.this.dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
         }
@@ -231,7 +224,7 @@ public class MakeCommentDialog extends SherlockDialogFragment implements OnClick
 
             ((AlertDialog) MakeCommentDialog.this.dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
 
-            MakeCommentDialog.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             MakeCommentDialog.this.dismiss();
 

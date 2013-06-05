@@ -8,7 +8,6 @@ import ie.broadsheet.app.requests.SubmitTipRequest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -44,16 +43,10 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
     private EditText message;
 
-    private ProgressDialog mProgressDialog;
-
     private String picturePath;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage(getResources().getString(R.string.posting_tip));
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -164,7 +157,7 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
 
-            mProgressDialog.show();
+            ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_tip));
 
             BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
@@ -214,14 +207,17 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get results: " + spiceException.toString());
 
-            TipDialog.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
+
+            ((BaseFragmentActivity) getActivity()).showError(getActivity().getResources().getString(
+                    R.string.tip_submit_problem));
         }
 
         @Override
         public void onRequestSuccess(final SubmitTipResponse result) {
             Log.d(TAG, "we got result: " + result.toString());
 
-            TipDialog.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             TipDialog.this.dismiss();
         }

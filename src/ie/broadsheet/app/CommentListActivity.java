@@ -8,13 +8,12 @@ import android.os.Bundle;
 import android.text.Html;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
-public class CommentListActivity extends SherlockFragmentActivity implements MakeCommentDialog.CommentMadeListener,
+public class CommentListActivity extends BaseFragmentActivity implements MakeCommentDialog.CommentMadeListener,
         CommentAdapter.ReplyCommentListener {
     private Post post;
 

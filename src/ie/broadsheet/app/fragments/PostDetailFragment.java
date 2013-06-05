@@ -13,7 +13,6 @@ import ie.broadsheet.app.model.json.SinglePost;
 import ie.broadsheet.app.requests.PostRequest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -62,8 +61,6 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     private ShareActionProvider actionProvider;
 
-    private ProgressDialog mProgressDialog;
-
     private Button next;
 
     private Button previous;
@@ -85,11 +82,8 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         String url = getArguments().getString(ARG_ITEM_URL);
 
         if (url != null) {
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage(getResources().getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mProgressDialog.show();
+
+            ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_comment));
 
             BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
@@ -314,7 +308,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         public void onRequestFailure(SpiceException spiceException) {
             Log.d(TAG, "Failed to get post");
 
-            PostDetailFragment.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
@@ -326,7 +320,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             Log.d(TAG, "we got a post: " + result.toString());
             PostDetailFragment.this.post = result.getPost();
 
-            PostDetailFragment.this.mProgressDialog.dismiss();
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             PostDetailFragment.this.getActivity().invalidateOptionsMenu();
 

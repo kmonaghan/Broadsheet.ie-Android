@@ -19,7 +19,7 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setMessage("Loading...");
+
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
@@ -49,11 +49,12 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
         super.onPause();
     }
 
-    protected void onPreExecute() {
+    public void onPreExecute(String message) {
+        mProgressDialog.setMessage(message);
         mProgressDialog.show();
     }
 
-    protected void onPostExecute() {
+    public void onPostExecute() {
         mProgressDialog.dismiss();
     }
 
