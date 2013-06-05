@@ -40,4 +40,5 @@
 	<string name="post_load_problem">There was a problem loading the post.</string>
 	<string name="post_list_load_problem">There was a problem loading the list of posts. Please try again in a minute.</string>
 	<string name="tip_submit_problem">There was a problem submitting the tip. Please try again in a minute.</string>
+	<string name="post_list_no_matching_posts">No posts! Try searching with another term.</string>
 </resources>

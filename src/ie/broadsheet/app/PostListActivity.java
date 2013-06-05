@@ -76,4 +76,8 @@ public class PostListActivity extends BaseFragmentActivity implements PostListFr
             startActivity(detailIntent);
         }
     }
+
+    public boolean isDualScreen() {
+        return mTwoPane;
+    }
 }

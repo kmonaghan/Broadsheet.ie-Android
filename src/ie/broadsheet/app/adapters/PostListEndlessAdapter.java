@@ -69,6 +69,10 @@ public class PostListEndlessAdapter extends EndlessAdapter {
         this.searchTerm = searchTerm;
     }
 
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
     public PostListLoadedListener getPostListLoadedListener() {
         return postListLoadedListener;
     }
@@ -140,6 +144,11 @@ public class PostListEndlessAdapter extends EndlessAdapter {
             PostListEndlessAdapter.this.postListLoadedListener.onPostListLoaded();
 
             app.getTracker().sendView("Post List Page" + Integer.toString(PostListEndlessAdapter.this.currentPage));
+
+            if (result.getCount_total() == 0) {
+                BaseFragmentActivity activity = (BaseFragmentActivity) getContext();
+                activity.showError(activity.getString(R.string.post_list_no_matching_posts));
+            }
         }
     }
 }

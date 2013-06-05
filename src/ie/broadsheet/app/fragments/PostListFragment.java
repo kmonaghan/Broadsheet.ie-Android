@@ -1,5 +1,6 @@
 package ie.broadsheet.app.fragments;
 
+import ie.broadsheet.app.PostListActivity;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter;
 import ie.broadsheet.app.adapters.PostListEndlessAdapter.PostListLoadedListener;
@@ -270,6 +271,10 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     public void onPostListLoaded() {
         searchProgress.dismiss();
         mPullRefreshListView.onRefreshComplete();
+
+        if ((((PostListActivity) getActivity()).isDualScreen()) && (postListAdapter.getCurrentPage() == 0)) {
+            mCallbacks.onItemSelected(1);
+        }
     }
 
     @Override
@@ -279,7 +284,9 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
 
     private void fetchPosts(String query) {
         postListAdapter.reset();
+        getListView().setSelection(0);
         postListAdapter.setSearchTerm(query);
         postListAdapter.fetchPosts();
+
     }
 }
