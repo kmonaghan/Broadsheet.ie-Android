@@ -54,19 +54,19 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     public static final String ARG_ITEM_URL = "item_url";
 
-    private Post post;
+    private Post mPost;
 
-    private WebView webview;
+    private WebView mWebview;
 
-    private int postIndex = -1;
+    private int mPostIndex = -1;
 
-    private ShareActionProvider actionProvider;
+    private ShareActionProvider mActionProvider;
 
-    private Button next;
+    private Button mNext;
 
-    private Button previous;
+    private Button mPrevious;
 
-    private BroadsheetApplication app;
+    private BroadsheetApplication mApp;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
@@ -92,9 +92,9 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
             activity.getSpiceManager().execute(postRequest, url, DurationInMillis.ONE_MINUTE, new PostListener());
         } else if (getArguments().containsKey(ARG_ITEM_ID)) {
-            app = (BroadsheetApplication) getActivity().getApplication();
-            postIndex = getArguments().getInt(ARG_ITEM_ID);
-            post = app.getPosts().get(postIndex);
+            mApp = (BroadsheetApplication) getActivity().getApplication();
+            mPostIndex = getArguments().getInt(ARG_ITEM_ID);
+            mPost = mApp.getPosts().get(mPostIndex);
         }
 
         setHasOptionsMenu(true);
@@ -106,20 +106,20 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        if (post != null) {
+        if (mPost != null) {
 
             inflater.inflate(R.menu.post_detail, menu);
 
-            menu.findItem(R.id.menu_make_comment).setVisible(post.getComment_status().equals("open"));
+            menu.findItem(R.id.menu_make_comment).setVisible(mPost.getComment_status().equals("open"));
 
-            menu.findItem(R.id.menu_view_comments).setVisible((post.getComment_count() > 0));
+            menu.findItem(R.id.menu_view_comments).setVisible((mPost.getComment_count() > 0));
 
             MenuItem actionItem = menu.findItem(R.id.menu_item_share_action_provider_action_bar);
 
-            actionProvider = (ShareActionProvider) actionItem.getActionProvider();
-            actionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+            mActionProvider = (ShareActionProvider) actionItem.getActionProvider();
+            mActionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
 
-            actionProvider.setShareIntent(createShareIntent());
+            mActionProvider.setShareIntent(createShareIntent());
         }
     }
 
@@ -137,28 +137,28 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_post_detail, container, false);
 
-        webview = (WebView) rootView.findViewById(R.id.webview);
+        mWebview = (WebView) rootView.findViewById(R.id.webview);
 
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.setWebViewClient(new MyWebViewClient(this.getActivity()));
         if (android.os.Build.VERSION.SDK_INT < 8) {
-            webview.getSettings().setPluginsEnabled(true);
+            mWebview.getSettings().setPluginsEnabled(true);
         } else {
-            webview.getSettings().setPluginState(PluginState.ON);
+            mWebview.getSettings().setPluginState(PluginState.ON);
         }
 
-        next = (Button) rootView.findViewById(R.id.next);
-        previous = (Button) rootView.findViewById(R.id.previous);
+        mNext = (Button) rootView.findViewById(R.id.next);
+        mPrevious = (Button) rootView.findViewById(R.id.previous);
 
-        next.setOnClickListener(this);
-        previous.setOnClickListener(this);
+        mNext.setOnClickListener(this);
+        mPrevious.setOnClickListener(this);
 
-        if (postIndex == -1) {
-            next.setVisibility(View.GONE);
-            previous.setVisibility(View.GONE);
+        if (mPostIndex == -1) {
+            mNext.setVisibility(View.GONE);
+            mPrevious.setVisibility(View.GONE);
         }
 
-        if (post != null) {
+        if (mPost != null) {
             layoutView();
         }
 
@@ -169,13 +169,13 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_view_comments) {
             Intent commentIntent = new Intent(this.getActivity(), CommentListActivity.class);
-            commentIntent.putExtra(PostDetailFragment.ARG_ITEM_ID, postIndex);
+            commentIntent.putExtra(PostDetailFragment.ARG_ITEM_ID, mPostIndex);
             startActivity(commentIntent);
             return true;
         } else if (item.getItemId() == R.id.menu_make_comment) {
 
             MakeCommentDialog dialog = new MakeCommentDialog();
-            dialog.setPostId(post.getId());
+            dialog.setPostId(mPost.getId());
             dialog.setCommentMadeListener(this);
             dialog.show(getActivity().getSupportFragmentManager(), "MakeCommentDialog");
         }
@@ -185,7 +185,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     private Intent createShareIntent() {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
 
-        String shareBody = post.getTitle() + " - " + post.getUrl();
+        String shareBody = mPost.getTitle() + " - " + mPost.getUrl();
 
         sharingIntent.setType("text/plain").putExtra(android.content.Intent.EXTRA_SUBJECT, "Broadsheet.ie")
                 .putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
@@ -195,7 +195,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     @Override
     public void onCommentMade(Comment comment) {
-        post.addComment(comment);
+        mPost.addComment(comment);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -203,33 +203,33 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         String postHTML = "<html><head>";
         postHTML += "<style>#singlentry {font-size: 16px;}</style><link href='default.css' rel='stylesheet' type='text/css' />";
         postHTML += "</head><body id=\"contentbody\"><div id='maincontent' class='content'><div class='post'><div id='title'>"
-                + post.getTitle()
+                + mPost.getTitle()
                 + "</div><div><span class='date-color'>"
-                + post.getDate()
+                + mPost.getDate()
                 + "</span>&nbsp;<a class='author' href=\"kmwordpress://author:%@\">"
-                + post.getAuthor().getName()
+                + mPost.getAuthor().getName()
                 + "</a></div>";
-        postHTML += "<div id='singlentry'>" + post.getContent() + "</div></div>";
+        postHTML += "<div id='singlentry'>" + mPost.getContent() + "</div></div>";
         postHTML += "</div></body></html>";
 
-        webview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
+        mWebview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
 
-        next.setEnabled((postIndex > 0));
-        previous.setEnabled(((postIndex + 1) < app.getPosts().size()));
+        mNext.setEnabled((mPostIndex > 0));
+        mPrevious.setEnabled(((mPostIndex + 1) < mApp.getPosts().size()));
 
-        app.getTracker()
-                .sendView("Post " + Html.fromHtml(post.getTitle_plain()) + " " + Integer.toString(post.getId()));
+        mApp.getTracker().sendView(
+                "Post " + Html.fromHtml(mPost.getTitle_plain()) + " " + Integer.toString(mPost.getId()));
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.next) {
-            postIndex--;
+            mPostIndex--;
         } else if (v.getId() == R.id.previous) {
-            postIndex++;
+            mPostIndex++;
         }
 
-        post = app.getPosts().get(postIndex);
+        mPost = mApp.getPosts().get(mPostIndex);
 
         layoutView();
     }
@@ -325,7 +325,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         @Override
         public void onRequestSuccess(final SinglePost result) {
             Log.d(TAG, "we got a post: " + result.toString());
-            PostDetailFragment.this.post = result.getPost();
+            PostDetailFragment.this.mPost = result.getPost();
 
             ((BaseFragmentActivity) getActivity()).onPostExecute();
 
