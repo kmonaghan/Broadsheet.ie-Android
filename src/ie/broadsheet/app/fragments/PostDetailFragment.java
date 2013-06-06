@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -107,7 +108,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         if (post != null) {
 
-            inflater.inflate(R.menu.posts, menu);
+            inflater.inflate(R.menu.post_detail, menu);
 
             menu.findItem(R.id.menu_make_comment).setVisible(post.getComment_status().equals("open"));
 
@@ -137,6 +138,14 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         View rootView = inflater.inflate(R.layout.fragment_post_detail, container, false);
 
         webview = (WebView) rootView.findViewById(R.id.webview);
+
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
+        if (android.os.Build.VERSION.SDK_INT < 8) {
+            webview.getSettings().setPluginsEnabled(true);
+        } else {
+            webview.getSettings().setPluginState(PluginState.ON);
+        }
 
         next = (Button) rootView.findViewById(R.id.next);
         previous = (Button) rootView.findViewById(R.id.previous);
@@ -203,9 +212,7 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         postHTML += "<div id='singlentry'>" + post.getContent() + "</div></div>";
         postHTML += "</div></body></html>";
 
-        webview.getSettings().setJavaScriptEnabled(true);
         webview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
-        webview.setWebViewClient(new MyWebViewClient(this.getActivity()));
 
         next.setEnabled((postIndex > 0));
         previous.setEnabled(((postIndex + 1) < app.getPosts().size()));

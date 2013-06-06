@@ -13,6 +13,9 @@
     <string name="action_label_about">About</string>
     <string name="action_label_compose">Compose</string>
     <string name="action_label_search">Search</string>
+    <string name="action_label_tip">Send tip</string>
+	<string name="action_label_about">About</string>
+	<string name="action_label_comments">Comments</string>
     <string name="title_activity_comment_list">CommentListActivity</string>
 	<string name="share_label">Share</string>
 	<string name="user_avatar">User avatar</string>

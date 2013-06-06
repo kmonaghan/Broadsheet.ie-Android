@@ -175,7 +175,7 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.post_list, menu);
 
         searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         searchView.setOnQueryTextListener(this);

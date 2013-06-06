@@ -17,24 +17,24 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- custom -->
+    <!-- icon -->
     <item
-        android:id="@+id/menu_search"
-        android:actionViewClass="com.actionbarsherlock.widget.SearchView"
-        android:icon="@drawable/ic_search"
+        android:id="@+id/menu_make_comment"
+        android:icon="@drawable/ic_compose"
         android:showAsAction="always"
-        android:title="@string/action_label_search"/>
+        android:title="@string/action_label_compose"/>
+
     <!-- icon -->
     <item
-        android:id="@+id/menu_submit_tip"
-        android:icon="@drawable/ic_action_photo"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_label_refresh"/>
-    <!-- icon -->
+        android:id="@+id/menu_view_comments"
+        android:icon="@drawable/ic_social_chat"
+        android:showAsAction="always"
+        android:title="@string/action_label_comments"/>
     <item
-        android:id="@+id/menu_view_about"
-        android:icon="@drawable/ic_action_about"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_label_refresh"/>
+        android:id="@+id/menu_item_share_action_provider_action_bar"
+        android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"
+        android:icon="@drawable/ic_action_share"
+        android:showAsAction="always"
+        android:title="@string/share_label"/>
 
 </menu>
