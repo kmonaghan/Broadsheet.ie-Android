@@ -272,7 +272,8 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
         searchProgress.dismiss();
         mPullRefreshListView.onRefreshComplete();
 
-        if ((((PostListActivity) getActivity()).isDualScreen()) && (postListAdapter.getCurrentPage() == 0)) {
+        if ((((PostListActivity) getActivity()).isDualScreen()) && (postListAdapter.getCurrentPage() == 1)) {
+            Log.d(TAG, "Setting first post");
             mCallbacks.onItemSelected(1);
         }
     }

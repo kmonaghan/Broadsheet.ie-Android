@@ -83,7 +83,7 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
     public void reset() {
         loaded = false;
-        hasMore = true;
+        hasMore = false;
         searchTerm = null;
         currentPage = 1;
     }
