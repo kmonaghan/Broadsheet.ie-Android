@@ -10,7 +10,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -32,21 +31,27 @@ import android.widget.ImageView.ScaleType;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-public class TipDialog extends DialogFragment implements OnClickListener, android.view.View.OnClickListener {
+public class TipDialog extends DialogFragment implements android.view.View.OnClickListener {
     private static final String TAG = "TipDialog";
 
     private static int RESULT_LOAD_IMAGE = 1;
 
-    private EditText name;
+    private EditText mName;
 
-    private EditText email;
+    private EditText mEmail;
 
-    private EditText message;
+    private EditText mMessage;
 
-    private String picturePath;
+    private String mPicturePath;
+
+    private boolean mAskedAboutPicture;
+
+    private Button mSelectPhoto;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mAskedAboutPicture = false;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -54,21 +59,21 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
         View view = inflater.inflate(R.layout.dialog_submit_tip, null);
 
-        name = (EditText) view.findViewById(R.id.submitterName);
-        email = (EditText) view.findViewById(R.id.submitorEmail);
-        message = (EditText) view.findViewById(R.id.submitBody);
+        mName = (EditText) view.findViewById(R.id.submitterName);
+        mEmail = (EditText) view.findViewById(R.id.submitorEmail);
+        mMessage = (EditText) view.findViewById(R.id.submitBody);
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        email.setText(sharedPref.getString("email", ""));
-        name.setText(sharedPref.getString("commenterName", ""));
+        mEmail.setText(sharedPref.getString("email", ""));
+        mName.setText(sharedPref.getString("commenterName", ""));
 
-        Button selectPhoto = (Button) view.findViewById(R.id.addImage);
-        selectPhoto.setOnClickListener(this);
+        mSelectPhoto = (Button) view.findViewById(R.id.addImage);
+        mSelectPhoto.setOnClickListener(this);
 
         builder.setView(view)
                 // Add action buttons
-                .setPositiveButton(R.string.submit_tip, this)
+                .setPositiveButton(R.string.submit_tip, null)
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         TipDialog.this.getDialog().cancel();
@@ -77,7 +82,7 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
 
         final Dialog dialog = builder.create();
 
-        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -114,13 +119,13 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            picturePath = cursor.getString(columnIndex);
+            mPicturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            Log.d(TAG, "Picture path is : " + picturePath);
+            Log.d(TAG, "Picture path is : " + mPicturePath);
 
             ImageView imageView = (ImageView) getDialog().findViewById(R.id.sumbitorImage);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            imageView.setImageBitmap(BitmapFactory.decodeFile(mPicturePath));
             imageView.setScaleType(ScaleType.CENTER_INSIDE);
         }
 
@@ -138,24 +143,32 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
             if (!validate()) {
                 return;
             }
+
+            if (!mAskedAboutPicture && (mPicturePath == null)) {
+                askAboutPicture();
+                mAskedAboutPicture = true;
+
+                return;
+            }
+
             SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("email", email.getText().toString());
-            editor.putString("commenterName", name.getText().toString());
+            editor.putString("email", mEmail.getText().toString());
+            editor.putString("commenterName", mName.getText().toString());
             editor.commit();
 
             SubmitTipRequest request = new SubmitTipRequest();
-            request.setName(name.getText().toString());
-            request.setEmail(email.getText().toString());
-            request.setMessage(message.getText().toString());
-            request.setFilename(picturePath);
+            request.setName(mName.getText().toString());
+            request.setEmail(mEmail.getText().toString());
+            request.setMessage(mMessage.getText().toString());
+            request.setFilename(mPicturePath);
 
-            email.clearFocus();
-            name.clearFocus();
-            message.clearFocus();
+            mEmail.clearFocus();
+            mName.clearFocus();
+            mMessage.clearFocus();
 
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(mMessage.getWindowToken(), 0);
 
             ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_tip));
 
@@ -165,36 +178,47 @@ public class TipDialog extends DialogFragment implements OnClickListener, androi
         }
     }
 
+    public void askAboutPicture() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.no_image_picked)
+                .setPositiveButton(R.string.add_an_image, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        TipDialog.this.onClick(mSelectPhoto);
+                    }
+                }).setNegativeButton(R.string.no_thanks, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        TipDialog.this.onClick(null);
+                    }
+                });
+
+        builder.create().show();
+    }
+
     private boolean validate() {
         boolean okay = true;
 
-        if ((name.getText().toString() == null) || (name.getText().toString().length() < 1)) {
+        if ((mName.getText().toString() == null) || (mName.getText().toString().length() < 1)) {
             okay = false;
-            name.setError(getResources().getString(R.string.error_no_name));
+            mName.setError(getResources().getString(R.string.error_no_name));
         } else {
-            name.setError(null);
+            mName.setError(null);
         }
 
-        if ((email.getText().toString() == null) || (email.getText().toString().length() < 1)) {
+        if ((mEmail.getText().toString() == null) || (mEmail.getText().toString().length() < 1)) {
             okay = false;
-            email.setError(getResources().getString(R.string.error_no_email));
+            mEmail.setError(getResources().getString(R.string.error_no_email));
         } else {
-            email.setError(null);
+            mEmail.setError(null);
         }
 
-        if ((message.getText().toString() == null) || (message.getText().toString().length() < 1)) {
+        if ((mMessage.getText().toString() == null) || (mMessage.getText().toString().length() < 1)) {
             okay = false;
-            message.setError(getResources().getString(R.string.error_no_message));
+            mMessage.setError(getResources().getString(R.string.error_no_message));
         } else {
-            message.setError(null);
+            mMessage.setError(null);
         }
 
         return okay;
-    }
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        Log.d(TAG, "the other click listener");
     }
 
     // ============================================================================================
