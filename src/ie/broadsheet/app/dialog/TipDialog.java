@@ -187,7 +187,7 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
                     }
                 }).setNegativeButton(R.string.no_thanks, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        TipDialog.this.onClick(null);
+                        TipDialog.this.onClick((Button) ((AlertDialog) dialog).getButton(Dialog.BUTTON_POSITIVE));
                     }
                 });
 
