@@ -26,7 +26,7 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
     private boolean loaded = false;
 
-    private int currentPage = 1;
+    private int currentPage = 0;
 
     private String searchTerm;
 
@@ -83,7 +83,7 @@ public class PostListEndlessAdapter extends EndlessAdapter {
 
     public void reset() {
         loaded = false;
-        hasMore = false;
+        hasMore = true;
         searchTerm = null;
         currentPage = 1;
     }

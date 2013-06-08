@@ -138,15 +138,6 @@ public class PostListFragment extends SherlockListFragment implements OnQueryTex
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        if (!postListAdapter.isLoaded()) {
-            fetchPosts(null);
-        }
-    }
-
-    @Override
     public void onPause() {
         searchProgress.dismiss();
         super.onPause();
