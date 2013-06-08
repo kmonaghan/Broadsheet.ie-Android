@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -68,12 +69,23 @@ public class AboutDialog extends DialogFragment implements OnClickListener {
             /* Create the Intent */
             final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 
+            String body = "";
+            String versionString;
+            try {
+                versionString = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+                body = String.format(getResources().getString(R.string.app_feedback_body), versionString,
+                        android.os.Build.VERSION.RELEASE);
+            } catch (NameNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             /* Fill it with Data */
             emailIntent.setType("plain/text");
             emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
                     new String[] { "feedback@crayonsandbrownpaper.com" });
             emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Feedback for Broadsheet.ie");
-            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
 
             /* Send it off to the Activity-Chooser */
             context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
