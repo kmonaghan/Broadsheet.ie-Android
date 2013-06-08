@@ -251,8 +251,12 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             if (uri.getHost().contains("youtube.com")) {
                 viewYoutube(mActivity, url);
                 return true;
+            }
+            if (uri.getHost().contains("vimeo.com")) {
+                viewVimeo(mActivity, url);
+                return true;
             } else if (url.contains("broadsheet.ie/20")) {
-                viewBroadsheetPost(mActivity, url);
+                viewBroadsheetPost(url);
                 return true;
             }
 
@@ -263,7 +267,12 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             viewWithPackageName(context, url, "com.google.android.youtube");
         }
 
-        public void viewBroadsheetPost(Context context, String url) {
+        public void viewVimeo(Context context, String url) {
+            Intent postIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(postIntent);
+        }
+
+        public void viewBroadsheetPost(String url) {
             Intent postIntent = new Intent(getActivity(), PostDetailActivity.class);
             postIntent.putExtra(PostDetailFragment.ARG_ITEM_URL, url);
             startActivity(postIntent);
