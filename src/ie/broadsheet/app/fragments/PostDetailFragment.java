@@ -94,7 +94,9 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
         } else if (getArguments().containsKey(ARG_ITEM_ID)) {
             mApp = (BroadsheetApplication) getActivity().getApplication();
             mPostIndex = getArguments().getInt(ARG_ITEM_ID);
-            mPost = mApp.getPosts().get(mPostIndex);
+            if (mPostIndex < mApp.getPosts().size()) {
+                mPost = mApp.getPosts().get(mPostIndex);
+            }
         }
 
         setHasOptionsMenu(true);
