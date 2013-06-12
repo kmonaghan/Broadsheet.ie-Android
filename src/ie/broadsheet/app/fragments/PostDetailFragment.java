@@ -216,8 +216,10 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         mWebview.loadDataWithBaseURL("file:///android_asset/", postHTML, "text/html", "UTF-8", null);
 
-        mNext.setEnabled((mPostIndex > 0));
-        mPrevious.setEnabled(((mPostIndex + 1) < mApp.getPosts().size()));
+        if ((mApp != null) && (mApp.getPosts().size() > 0)) {
+            mNext.setEnabled((mPostIndex > 0));
+            mPrevious.setEnabled(((mPostIndex + 1) < mApp.getPosts().size()));
+        }
 
         mApp.getTracker().sendView(
                 "Post " + Html.fromHtml(mPost.getTitle_plain()) + " " + Integer.toString(mPost.getId()));
