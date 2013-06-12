@@ -31,7 +31,10 @@ public class BroadsheetApplication extends Application {
         if ((this.posts == null) || (posts == null)) {
             this.posts = posts;
         } else if (this.posts.size() > 0) {
-            this.posts.addAll(posts);
+            // this.posts.addAll(posts);
+            for (Post post : posts) {
+                this.posts.add(post);
+            }
         } else {
             this.posts = posts;
         }

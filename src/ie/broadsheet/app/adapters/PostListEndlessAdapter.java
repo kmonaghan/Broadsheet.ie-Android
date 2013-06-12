@@ -3,6 +3,7 @@ package ie.broadsheet.app.adapters;
 import ie.broadsheet.app.BaseFragmentActivity;
 import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.R;
+import ie.broadsheet.app.model.json.Post;
 import ie.broadsheet.app.model.json.PostList;
 import ie.broadsheet.app.requests.PostListRequest;
 import android.content.Context;
@@ -136,7 +137,13 @@ public class PostListEndlessAdapter extends EndlessAdapter {
             }
             app.setPosts(result.getPosts());
 
-            ((PostListAdapter) getWrappedAdapter()).addAll(result.getPosts());
+            // ((PostListAdapter) getWrappedAdapter()).addAll(result.getPosts());
+            PostListAdapter adapter = (PostListAdapter) getWrappedAdapter();
+
+            for (Post post : result.getPosts()) {
+                adapter.add(post);
+            }
+
             onDataReady();
 
             postListRequest = null;

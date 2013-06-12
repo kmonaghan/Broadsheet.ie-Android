@@ -12,7 +12,6 @@ import java.util.TreeSet;
 
 import android.annotation.SuppressLint;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.google.api.client.util.Key;
 
@@ -461,10 +460,11 @@ public class Post {
                 sortedComments.add(comment);
 
                 if ((comment.getChildComment() != null) && (comment.getChildComment().size() > 0)) {
-                    sortedComments.addAll(flattenComments(comment.getChildComment()));
+                    // sortedComments.addAll(flattenComments(comment.getChildComment()));
+                    for (Comment addcomment : flattenComments(comment.getChildComment())) {
+                        sortedComments.add(addcomment);
+                    }
                 }
-            } else {
-                Log.d(TAG, "comment is null?");
             }
         }
 

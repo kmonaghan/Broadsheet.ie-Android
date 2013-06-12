@@ -88,7 +88,10 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
         post.addComment(comment);
 
         comments.clear();
-        comments.addAll(post.getSortedComments());
+        // comments.addAll(post.getSortedComments());
+        for (Comment addcomment : post.getSortedComments()) {
+            comments.add(addcomment);
+        }
         comments.notifyDataSetChanged();
     }
 

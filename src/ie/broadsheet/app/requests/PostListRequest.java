@@ -15,6 +15,8 @@ import com.google.api.client.json.jackson.JacksonFactory;
 import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 
 public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
+    private static final String TAG = "PostListRequest";
+
     private String baseUrl;
 
     private int page = 1;
@@ -42,7 +44,7 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
     public PostListRequest() {
         super(PostList.class);
 
-        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "?json=1";
+        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "/?json=1";
 
     }
 
@@ -71,6 +73,8 @@ public class PostListRequest extends GoogleHttpClientSpiceRequest<PostList> {
                 e.printStackTrace();
             }
         }
+
+        Log.d(TAG, generatedURL);
 
         return generatedURL;
     }
