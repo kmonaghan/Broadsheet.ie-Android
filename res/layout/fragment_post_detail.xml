@@ -9,28 +9,27 @@
         android:layout_marginBottom="48dp" />
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        style="?android:attr/buttonBarStyle" >
-
-        <Button
-            android:id="@+id/next"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/next"
-            android:layout_weight="1" 
-            style="?android:attr/buttonBarButtonStyle"/>
+        android:layout_alignParentLeft="true" >
 
         <Button
             android:id="@+id/previous"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/previous" 
             android:layout_weight="1"
-            style="?android:attr/buttonBarButtonStyle"/>
+            android:text="@string/previous" />
 
+        <Button
+            android:id="@+id/next"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/next" />
     </LinearLayout>
 
 </RelativeLayout>
