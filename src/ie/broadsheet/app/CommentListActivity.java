@@ -29,7 +29,9 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
         if (extras != null) {
             BroadsheetApplication app = (BroadsheetApplication) getApplication();
 
-            post = app.getPosts().get(extras.getInt("item_id"));
+            if (app.getPosts().size() > 0) {
+                post = app.getPosts().get(extras.getInt("item_id"));
+            }
         }
 
         ListView list = (ListView) findViewById(android.R.id.list);
