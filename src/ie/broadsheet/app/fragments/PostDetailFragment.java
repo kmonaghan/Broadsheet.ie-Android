@@ -54,6 +54,10 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
     public static final String ARG_ITEM_URL = "item_url";
 
+    public static final String CURRENT_POST = "current_post";
+
+    public static final String CURRENT_POST_ID = "current_post_id";
+
     private Post mPost;
 
     private WebView mWebview;
@@ -80,22 +84,30 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String url = getArguments().getString(ARG_ITEM_URL);
+        mApp = (BroadsheetApplication) getActivity().getApplication();
 
-        if (url != null) {
+        if (savedInstanceState != null) {
+            Log.d(TAG, "saved instance");
+            mPost = (Post) savedInstanceState.getSerializable(CURRENT_POST);
+            mPostIndex = savedInstanceState.getInt(CURRENT_POST_ID, -1);
+        } else {
+            String url = getArguments().getString(ARG_ITEM_URL);
 
-            ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_comment));
+            if (url != null) {
 
-            BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
+                ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.posting_comment));
 
-            PostRequest postRequest = new PostRequest(url);
+                BaseFragmentActivity activity = (BaseFragmentActivity) getActivity();
 
-            activity.getSpiceManager().execute(postRequest, url, DurationInMillis.ONE_MINUTE, new PostListener());
-        } else if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mApp = (BroadsheetApplication) getActivity().getApplication();
-            mPostIndex = getArguments().getInt(ARG_ITEM_ID);
-            if (mPostIndex < mApp.getPosts().size()) {
-                mPost = mApp.getPosts().get(mPostIndex);
+                PostRequest postRequest = new PostRequest(url);
+
+                activity.getSpiceManager().execute(postRequest, url, DurationInMillis.ONE_MINUTE, new PostListener());
+            } else if (getArguments().containsKey(ARG_ITEM_ID)) {
+
+                mPostIndex = getArguments().getInt(ARG_ITEM_ID);
+                if (mPostIndex < mApp.getPosts().size()) {
+                    mPost = mApp.getPosts().get(mPostIndex);
+                }
             }
         }
 
@@ -223,8 +235,10 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
         getActivity().supportInvalidateOptionsMenu();
 
-        mApp.getTracker().sendView(
-                "Post " + Html.fromHtml(mPost.getTitle_plain()) + " " + Integer.toString(mPost.getId()));
+        if (mPost != null) {
+            mApp.getTracker().sendView(
+                    "Post " + Html.fromHtml(mPost.getTitle_plain()) + " " + Integer.toString(mPost.getId()));
+        }
     }
 
     @Override
@@ -233,6 +247,10 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
             mPostIndex++;
         } else if (v.getId() == R.id.previous) {
             mPostIndex--;
+        }
+
+        if (mPostIndex == -1) {
+            return;
         }
 
         mPost = mApp.getPosts().get(mPostIndex);
@@ -348,5 +366,18 @@ public class PostDetailFragment extends SherlockFragment implements MakeCommentD
 
             PostDetailFragment.this.layoutView();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "saving instance");
+
+        super.onSaveInstanceState(savedInstanceState);
+
+        if (mPostIndex != -1) {
+            savedInstanceState.putInt(CURRENT_POST_ID, mPostIndex);
+        }
+
+        savedInstanceState.putSerializable(CURRENT_POST, mPost);
     }
 }

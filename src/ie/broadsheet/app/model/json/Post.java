@@ -1,5 +1,6 @@
 package ie.broadsheet.app.model.json;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ import android.text.format.DateUtils;
 
 import com.google.api.client.util.Key;
 
-public class Post {
-    private static final String TAG = "Post";
+public class Post implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Key
     private int id;

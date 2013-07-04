@@ -6,6 +6,7 @@ import ie.broadsheet.app.model.json.Comment;
 import ie.broadsheet.app.model.json.Post;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.actionbarsherlock.view.Menu;
@@ -15,7 +16,11 @@ import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 public class CommentListActivity extends BaseFragmentActivity implements MakeCommentDialog.CommentMadeListener,
         CommentAdapter.ReplyCommentListener {
-    private Post post;
+    private static final String TAG = "CommentListActivity";
+
+    public static final String CURRENT_POST = "current_post";
+
+    private Post mPost;
 
     private CommentAdapter comments;
 
@@ -24,19 +29,24 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment_list);
 
-        Bundle extras = getIntent().getExtras();
+        if (savedInstanceState != null) {
+            Log.d(TAG, "saved instance");
+            mPost = (Post) savedInstanceState.getSerializable(CURRENT_POST);
+        } else {
+            Bundle extras = getIntent().getExtras();
 
-        if (extras != null) {
-            BroadsheetApplication app = (BroadsheetApplication) getApplication();
+            if (extras != null) {
+                BroadsheetApplication app = (BroadsheetApplication) getApplication();
 
-            if (app.getPosts().size() > 0) {
-                post = app.getPosts().get(extras.getInt("item_id"));
+                if (app.getPosts().size() > 0) {
+                    mPost = app.getPosts().get(extras.getInt("item_id"));
+                }
             }
         }
 
         ListView list = (ListView) findViewById(android.R.id.list);
 
-        comments = new CommentAdapter(this, R.layout.comment_list_item, post.getSortedComments());
+        comments = new CommentAdapter(this, R.layout.comment_list_item, mPost.getSortedComments());
         comments.setReplyCommentListener(this);
 
         list.setAdapter(comments);
@@ -57,7 +67,7 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
         super.onStart();
 
         ((BroadsheetApplication) getApplication()).getTracker().sendView(
-                "Comment List: " + Html.fromHtml(post.getTitle_plain()) + " " + Integer.toString(post.getId()));
+                "Comment List: " + Html.fromHtml(mPost.getTitle_plain()) + " " + Integer.toString(mPost.getId()));
     }
 
     @Override
@@ -68,7 +78,7 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (post.getComment_status().equals("open")) {
+        if (mPost.getComment_status().equals("open")) {
             getSupportMenuInflater().inflate(R.menu.comment_list, menu);
         }
         return true;
@@ -87,11 +97,11 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
 
     @Override
     public void onCommentMade(Comment comment) {
-        post.addComment(comment);
+        mPost.addComment(comment);
 
         comments.clear();
-        // comments.addAll(post.getSortedComments());
-        for (Comment addcomment : post.getSortedComments()) {
+        // comments.addAll(mPost.getSortedComments());
+        for (Comment addcomment : mPost.getSortedComments()) {
             comments.add(addcomment);
         }
         comments.notifyDataSetChanged();
@@ -100,9 +110,18 @@ public class CommentListActivity extends BaseFragmentActivity implements MakeCom
     @Override
     public void onReply(int commentId) {
         MakeCommentDialog dialog = new MakeCommentDialog();
-        dialog.setPostId(post.getId());
+        dialog.setPostId(mPost.getId());
         dialog.setCommentMadeListener(this);
         dialog.setCommentId(commentId);
         dialog.show(this.getSupportFragmentManager(), "MakeCommentDialog");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "saving instance");
+
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putSerializable(CURRENT_POST, mPost);
     }
 }

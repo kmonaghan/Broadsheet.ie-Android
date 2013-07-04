@@ -1,8 +1,12 @@
 package ie.broadsheet.app.model.json;
 
+import java.io.Serializable;
+
 import com.google.api.client.util.Key;
 
-public class SinglePost {
+public class SinglePost implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Key
     private String status;
 
