@@ -4,18 +4,29 @@ import ie.broadsheet.app.BaseFragmentActivity;
 import ie.broadsheet.app.BroadsheetApplication;
 import ie.broadsheet.app.R;
 import ie.broadsheet.app.model.json.SubmitTipResponse;
+import ie.broadsheet.app.requests.DownloadFileRequest;
 import ie.broadsheet.app.requests.SubmitTipRequest;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -28,13 +39,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.DiscCacheUtil;
+import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 public class TipDialog extends DialogFragment implements android.view.View.OnClickListener {
     private static final String TAG = "TipDialog";
 
-    private static int RESULT_LOAD_IMAGE = 1;
+    private static final String TEMP_FILENAME = "user_image.jpg";
+
+    private static final int IMAGE_REQUEST_CODE = 1000;
 
     private EditText mName;
 
@@ -47,6 +63,8 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
     private boolean mAskedAboutPicture;
 
     private Button mSelectPhoto;
+
+    private DownloadFileRequest downloadFileRequest;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -111,35 +129,67 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+            case IMAGE_REQUEST_CODE:
+                final boolean isCamera = data == null
+                        || android.provider.MediaStore.ACTION_IMAGE_CAPTURE.equals(data.getAction());
 
-            Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
+                if (isCamera) {
+                    // File picture = new File(getActivity().getExternalCacheDir(), TEMP_FILENAME);
+                    mPicturePath = getActivity().getCacheDir() + "/" + TEMP_FILENAME;
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            mPicturePath = cursor.getString(columnIndex);
-            cursor.close();
+                    Log.d(TAG, "From the camera: " + mPicturePath);
 
-            Log.d(TAG, "Picture path is : " + mPicturePath);
+                    showImage();
+                } else {
+                    Uri imageUri = data.getData();
+                    // some devices (OS versions return an URI of com.android instead of com.google.android
+                    if (imageUri.toString().startsWith("content://com.android.gallery3d.provider")) {
+                        imageUri = Uri.parse(imageUri.toString().replace("com.android.gallery3d",
+                                "com.google.android.gallery3d"));
+                    }
 
-            ImageView imageView = (ImageView) getDialog().findViewById(R.id.sumbitorImage);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(mPicturePath));
-            imageView.setScaleType(ScaleType.CENTER_INSIDE);
+                    mPicturePath = null;
+                    String[] projection = { MediaStore.Images.Media.DATA };
+                    Cursor cursor = getActivity().getContentResolver().query(imageUri, projection, null, null, null);
+                    if (cursor != null) {
+                        int column_index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                        if (column_index != -1) {
+                            cursor.moveToFirst();
+                            mPicturePath = cursor.getString(column_index);
+                        }
+                    }
+
+                    if (mPicturePath == null)
+                        mPicturePath = imageUri.getPath();
+
+                    Log.d(TAG, "from gallery: " + mPicturePath);
+
+                    if (mPicturePath != null) {
+                        File file = new File(mPicturePath);
+                        if (file.exists()) {
+                            showImage();
+                        } else if (mPicturePath.matches("http(s)?://.*"))
+                            downloadImage();
+                        else {
+                            // error
+                        }
+
+                    } else {
+                        // Error
+                    }
+                }
+                break;
+            }
         }
-
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.addImage) {
-            Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-            startActivityForResult(i, RESULT_LOAD_IMAGE);
+            selectImage();
         } else {
-            Log.d(TAG, "clicked submit button");
-
             if (!validate()) {
                 return;
             }
@@ -178,12 +228,59 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
         }
     }
 
+    public void showImage() {
+        ImageView imageView = (ImageView) getDialog().findViewById(R.id.sumbitorImage);
+        imageView.setImageBitmap(BitmapFactory.decodeFile(mPicturePath));
+        imageView.setScaleType(ScaleType.CENTER_INSIDE);
+    }
+
+    protected void selectImage() {
+        File tempFile = new File(getActivity().getCacheDir(), TEMP_FILENAME);
+        try {
+            Log.d(TAG, "camera filename: " + tempFile.getPath() + " abs name" + tempFile.getCanonicalPath());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Uri outputFileUri = Uri.fromFile(tempFile);
+        MemoryCacheUtil.removeFromCache(outputFileUri.toString(), ImageLoader.getInstance().getMemoryCache());
+        DiscCacheUtil.removeFromCache(outputFileUri.toString(), ImageLoader.getInstance().getDiscCache());
+        final List<Intent> cameraIntents = new ArrayList<Intent>();
+        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        final PackageManager packageManager = getActivity().getPackageManager();
+        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            final Intent intent = new Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            cameraIntents.add(intent);
+        }
+
+        final Intent pickPhoto = new Intent();
+        pickPhoto.setType("image/*");
+        pickPhoto.setAction(Intent.ACTION_GET_CONTENT);
+        final Intent chooserIntent = Intent.createChooser(pickPhoto, getResources().getString(R.string.selectGallery));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[] {}));
+        startActivityForResult(chooserIntent, IMAGE_REQUEST_CODE);
+    }
+
+    private void downloadImage() {
+        if (downloadFileRequest != null && !downloadFileRequest.isCancelled())
+            downloadFileRequest.cancel();
+        downloadFileRequest = new DownloadFileRequest(mPicturePath, getActivity().getExternalCacheDir());
+        ((BaseFragmentActivity) getActivity()).getSpiceManager().execute(downloadFileRequest,
+                new DownloadRequestListener());
+        ((BaseFragmentActivity) getActivity()).onPreExecute(getResources().getString(R.string.downloadingFile));
+    }
+
     public void askAboutPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.no_image_picked)
                 .setPositiveButton(R.string.add_an_image, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        TipDialog.this.onClick(mSelectPhoto);
+                        TipDialog.this.selectImage();
                     }
                 }).setNegativeButton(R.string.no_thanks, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -244,6 +341,26 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
             ((BaseFragmentActivity) getActivity()).onPostExecute();
 
             TipDialog.this.dismiss();
+        }
+    }
+
+    private class DownloadRequestListener implements RequestListener<File> {
+
+        @Override
+        public void onRequestFailure(SpiceException e) {
+            TipDialog.this.downloadFileRequest = null;
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
+            Log.d(TAG, "Problem downloading");
+        }
+
+        @Override
+        public void onRequestSuccess(File result) {
+            TipDialog.this.downloadFileRequest = null;
+            ((BaseFragmentActivity) getActivity()).onPostExecute();
+            Log.d(TAG, result.toString());
+
+            TipDialog.this.mPicturePath = result.getPath();
+            TipDialog.this.showImage();
         }
     }
 }
