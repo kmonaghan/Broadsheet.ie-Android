@@ -4,7 +4,8 @@
     android:name="ie.broadsheet.app.fragments.PostListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="@dimen/standard_margin"
-    android:layout_marginRight="@dimen/standard_margin"
+    android:divider="@drawable/line"
+    android:dividerHeight="2dp"
+    android:scrollbarStyle="outsideOverlay"
     tools:context=".PostListActivity"
     tools:layout="@android:layout/list_content" />

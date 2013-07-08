@@ -2,7 +2,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/abs__action_bar_default_height"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/standard_margin"
+    android:paddingRight="@dimen/standard_margin" >
 
     <TextView
         android:id="@+id/post_title"
@@ -32,7 +34,6 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:text="" />
-
     </RelativeLayout>
 
     <ImageView
