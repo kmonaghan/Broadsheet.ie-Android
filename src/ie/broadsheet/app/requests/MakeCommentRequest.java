@@ -81,7 +81,7 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
     public MakeCommentRequest() {
         super(Comment.class);
 
-        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "?json=respond.submit_comment";
+        this.baseUrl = BroadsheetApplication.context().getString(R.string.apiURL) + "/?json=respond.submit_comment";
 
     }
 
@@ -91,9 +91,10 @@ public class MakeCommentRequest extends GoogleHttpClientSpiceRequest<Comment> {
         data.put("post_id", postId);
         data.put("email", email);
         data.put("name", commentName);
-        data.put("url", commentUrl);
+        if (commentUrl.length() > 0) {
+            data.put("url", commentUrl);
+        }
         data.put("content", commentBody);
-
         if (commentId > 0) {
             data.put("comment_parent", commentId);
         }
