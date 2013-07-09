@@ -9,7 +9,9 @@ import ie.broadsheet.app.requests.SubmitTipRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -23,9 +25,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
@@ -39,18 +43,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.DiscCacheUtil;
-import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 public class TipDialog extends DialogFragment implements android.view.View.OnClickListener {
     private static final String TAG = "TipDialog";
 
-    private static final String TEMP_FILENAME = "user_image.jpg";
-
     private static final int IMAGE_REQUEST_CODE = 1000;
+
+    public static final String CURRENT_IMAGE_FILENAME = "image_filename";
 
     private EditText mName;
 
@@ -60,6 +61,8 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
 
     private String mPicturePath;
 
+    private String mCurrentPhotoPath;
+
     private boolean mAskedAboutPicture;
 
     private Button mSelectPhoto;
@@ -68,6 +71,10 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        if (savedInstanceState != null) {
+            mCurrentPhotoPath = savedInstanceState.getString(CURRENT_IMAGE_FILENAME);
+        }
 
         mAskedAboutPicture = false;
 
@@ -132,12 +139,13 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
             case IMAGE_REQUEST_CODE:
-                final boolean isCamera = data == null
+                final boolean isCamera = (data == null)
                         || android.provider.MediaStore.ACTION_IMAGE_CAPTURE.equals(data.getAction());
 
                 if (isCamera) {
-                    // File picture = new File(getActivity().getExternalCacheDir(), TEMP_FILENAME);
-                    mPicturePath = getActivity().getCacheDir() + "/" + TEMP_FILENAME;
+                    mPicturePath = mCurrentPhotoPath;
+
+                    galleryAddPic();
 
                     Log.d(TAG, "From the camera: " + mPicturePath);
 
@@ -161,8 +169,7 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
                         }
                     }
 
-                    if (mPicturePath == null)
-                        mPicturePath = imageUri.getPath();
+                    if (mPicturePath == null) mPicturePath = imageUri.getPath();
 
                     Log.d(TAG, "from gallery: " + mPicturePath);
 
@@ -174,10 +181,12 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
                             downloadImage();
                         else {
                             // error
+                            Log.d(TAG, "we've an error as the file doesn't exist or isn't a URL");
                         }
 
                     } else {
                         // Error
+                        Log.d(TAG, "we've an error as the file doesn't exist or isn't a URL");
                     }
                 }
                 break;
@@ -230,22 +239,48 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
 
     public void showImage() {
         ImageView imageView = (ImageView) getDialog().findViewById(R.id.sumbitorImage);
-        imageView.setImageBitmap(BitmapFactory.decodeFile(mPicturePath));
+
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        /* Get the size of the image */
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mPicturePath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        /* Figure out which way needs to be reduced less */
+        int scaleFactor = 1;
+        if ((targetW > 0) || (targetH > 0)) {
+            scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+        }
+
+        /* Set bitmap options to scale the image decode target */
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        /* Decode the JPEG file into a Bitmap */
+        Bitmap bitmap = BitmapFactory.decodeFile(mPicturePath, bmOptions);
+
+        imageView.setImageBitmap(bitmap);
         imageView.setScaleType(ScaleType.CENTER_INSIDE);
     }
 
     protected void selectImage() {
-        File tempFile = new File(getActivity().getCacheDir(), TEMP_FILENAME);
+        File tempFile = null;
         try {
-            Log.d(TAG, "camera filename: " + tempFile.getPath() + " abs name" + tempFile.getCanonicalPath());
+            tempFile = createImageFile();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+        mCurrentPhotoPath = tempFile.getAbsolutePath();
+
         Uri outputFileUri = Uri.fromFile(tempFile);
-        MemoryCacheUtil.removeFromCache(outputFileUri.toString(), ImageLoader.getInstance().getMemoryCache());
-        DiscCacheUtil.removeFromCache(outputFileUri.toString(), ImageLoader.getInstance().getDiscCache());
+
         final List<Intent> cameraIntents = new ArrayList<Intent>();
         final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         final PackageManager packageManager = getActivity().getPackageManager();
@@ -261,14 +296,55 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
         final Intent pickPhoto = new Intent();
         pickPhoto.setType("image/*");
         pickPhoto.setAction(Intent.ACTION_GET_CONTENT);
+        pickPhoto.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         final Intent chooserIntent = Intent.createChooser(pickPhoto, getResources().getString(R.string.selectGallery));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[] {}));
         startActivityForResult(chooserIntent, IMAGE_REQUEST_CODE);
     }
 
+    private File getAlbumDir() {
+        File storageDir = null;
+
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+
+            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    getString(R.string.app_name));
+
+            if (storageDir != null) {
+                if (!storageDir.mkdirs()) {
+                    if (!storageDir.exists()) {
+                        Log.d(TAG, "failed to create directory");
+                        return null;
+                    }
+                }
+            }
+
+        } else {
+            Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
+        }
+
+        return storageDir;
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "BS_" + timeStamp + "_";
+        File image = File.createTempFile(imageFileName, ".jpg", getAlbumDir());
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getActivity().sendBroadcast(mediaScanIntent);
+    }
+
     private void downloadImage() {
-        if (downloadFileRequest != null && !downloadFileRequest.isCancelled())
-            downloadFileRequest.cancel();
+        if (downloadFileRequest != null && !downloadFileRequest.isCancelled()) downloadFileRequest.cancel();
         downloadFileRequest = new DownloadFileRequest(mPicturePath, getActivity().getExternalCacheDir());
         ((BaseFragmentActivity) getActivity()).getSpiceManager().execute(downloadFileRequest,
                 new DownloadRequestListener());
@@ -362,5 +438,14 @@ public class TipDialog extends DialogFragment implements android.view.View.OnCli
             TipDialog.this.mPicturePath = result.getPath();
             TipDialog.this.showImage();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "saving instance");
+
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putSerializable(CURRENT_IMAGE_FILENAME, mCurrentPhotoPath);
     }
 }
